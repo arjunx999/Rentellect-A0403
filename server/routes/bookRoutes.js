@@ -1,0 +1,30 @@
+import express from "express";
+import { upload } from "../middleware/multer";
+import {
+  deleteListing,
+  getBookById,
+  getBooks,
+  listBook,
+  saveCondition,
+} from "../controllers/bookController";
+import { verifyToken } from "../middleware/auth.js";
+
+const router = express.Router();
+
+// list new book
+router.post("/list-new", upload.array("bookImages", 4), listBook, verifyToken);
+// "bookImages" should match the form field name in the frontend
+
+// delete a listing
+router.delete("/delete-listing/:id", verifyToken, deleteListing);
+
+// save condition of book
+router.patch("/save-condition/:id", verifyToken, saveCondition);
+
+// get all books
+router.get("/", verifyToken, getBooks);
+
+// get book by id
+router.get("/:id", verifyToken, getBookById);
+
+export default router;
