@@ -1,10 +1,12 @@
 import express from "express";
 import { upload } from "../middleware/multer";
 import {
+  bookReturn,
   deleteListing,
   getBookById,
   getBooks,
   listBook,
+  rentBook,
   saveCondition,
 } from "../controllers/bookController";
 import { verifyToken } from "../middleware/auth.js";
@@ -12,7 +14,7 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 // list new book
-router.post("/list-new", upload.array("bookImages", 4), listBook, verifyToken);
+router.post("/list-new", verifyToken, upload.array("bookImages", 4), listBook);
 // "bookImages" should match the form field name in the frontend
 
 // delete a listing
@@ -26,5 +28,11 @@ router.get("/", verifyToken, getBooks);
 
 // get book by id
 router.get("/:id", verifyToken, getBookById);
+
+// rent a book
+router.post("/rent-book", verifyToken, rentBook)
+
+// return a book
+router.patch("/return-book/:id", verifyToken, bookReturn)
 
 export default router;

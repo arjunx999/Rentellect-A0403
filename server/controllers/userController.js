@@ -72,8 +72,6 @@ export const ownerBooks = async (req, res) => {
       activeRentals,
       availableBooks,
     });
-
-    res.status(200).json(books);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
