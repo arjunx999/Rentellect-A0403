@@ -4,8 +4,8 @@ import {
   getUserConversations,
   ownerBooks,
   rentedBooks,
-} from "../controllers/userController";
-import { verifyToken } from "../middleware/auth";
+} from "../controllers/userController.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -16,3 +16,5 @@ router.get("/getConversations", getUserConversations, verifyToken);
 router.get("/rentedBooks", rentedBooks, verifyToken);
 
 router.get("/owner-stats", ownerBooks, verifyToken);
+
+export default router;

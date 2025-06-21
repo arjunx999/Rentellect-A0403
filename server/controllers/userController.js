@@ -1,5 +1,5 @@
-import { User } from "../models/user";
-import { Message } from "../models/message";
+import { User } from "../models/user.js";
+import { Message } from "../models/message.js";
 
 export const getUser = async (req, res) => {
   try {

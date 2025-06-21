@@ -1,5 +1,5 @@
 import express from "express";
-import { upload } from "../middleware/multer";
+import { upload } from "../middleware/multer.js";
 import {
   bookReturn,
   deleteListing,
@@ -8,7 +8,7 @@ import {
   listBook,
   rentBook,
   saveCondition,
-} from "../controllers/bookController";
+} from "../controllers/bookController.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();

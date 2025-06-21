@@ -1,6 +1,6 @@
-import { Book } from "../models/book";
+import { Book } from "../models/book.js";
 import Razorpay from "razorpay";
-import { User } from "../models/user";
+import { User } from "../models/user.js";
 
 export const listBook = async (req, res) => {
   try {
