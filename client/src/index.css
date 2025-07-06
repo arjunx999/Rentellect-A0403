@@ -52,10 +52,22 @@
   color: #333;
 }
 
+.neu-input {
+  background-color: #e0e0e0;
+  border-radius: 18px;
+  /* box-shadow: inset 4px 4px 10px #bcbcbc,  inset -5px -5px 20px #ffffff; */
+  box-shadow: inset 2px 2px 5px #bcbcbc, inset -2px -2px 5px #ffffff,
+    2px 2px 5px #bcbcbc, -2px -2px 5px #ffffff;
+  color: #4d4d4d;
+  padding: 10px 20px;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid rgb(206, 206, 206);
+}
+
 .neu-box-s {
   background-color: #e0e0e0;
-   border-top-left-radius: 140px;
-  border-bottom-left-radius: 140px;
+  /* border-top-left-radius: 140px;
+  border-bottom-left-radius: 140px; */
   /* box-shadow: inset 4px 4px 10px #bcbcbc,  inset -5px -5px 20px #ffffff; */
   box-shadow: inset 2px 2px 25px #bcbcbc, inset -2px -2px 5px #ffffff,
     2px 2px 5px #bcbcbc, -2px -2px 20px #ffffff;
@@ -73,10 +85,10 @@
 
 .neu-box-l {
   background-color: #e0e0e0;
-   border-top-right-radius: 140px;
+  /* border-top-right-radius: 140px;
   border-bottom-right-radius: 140px;
    border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border-bottom-left-radius: 0; */
   /* box-shadow: inset 4px 4px 10px #bcbcbc,  inset -5px -5px 20px #ffffff; */
   box-shadow: inset 2px 2px 25px #bcbcbc, inset -2px -2px 5px #ffffff,
     2px 2px 5px #bcbcbc, -2px -2px 20px #ffffff;

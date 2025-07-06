@@ -184,7 +184,9 @@ const Landing = () => {
             <h1 className="font-black text-lg">-------</h1>
           </div>
           <div className="lg:w-[35vw] h-[20vh] lg:h-[85%] bg--400 rounded-3xl neu-button-log flex justify-center flex-col">
-            <h1 className="text-3xl font-semibold lg:font-bold lg:text-3xl px-4">List a Book :</h1>
+            <h1 className="text-3xl font-semibold lg:font-bold lg:text-3xl px-4">
+              List a Book :
+            </h1>
             <h2 className="px-4 lg:pt-4 text-sm lg:text-base">
               Enter the book details and upload clear photos — our trained model
               will automatically predict and tag its condition (good, fair, or
@@ -201,7 +203,9 @@ const Landing = () => {
             <h1 className="font-black text-lg">-------</h1>
           </div>
           <div className="lg:w-[35vw] h-[20vh] lg:h-[85%] bg--400 rounded-3xl neu-button-log flex justify-center flex-col">
-            <h1 className="text-3xl font-semibold lg:font-bold lg:text-3xl px-4">Rent or Borrow :</h1>
+            <h1 className="text-3xl font-semibold lg:font-bold lg:text-3xl px-4">
+              Rent or Borrow :
+            </h1>
             <h2 className="px-4 lg:pt-4 text-sm lg:text-base">
               Find a book you need and request the owner to rent it. You can
               directly chat with them for any questions, meetups, or
@@ -256,13 +260,13 @@ const Landing = () => {
         </div>
         <div className="lg:w-[35vw] lg:h-[60%] mx-auto my-[5vh] lg:mt-[10vh] bg--500 flex font-[poppins] items-center justify-start lg:gap-x-[3vw] gap-x-[5vw]">
           <a target="blank" href="https://github.com/arjunx999/">
-            <i class="ri-github-fill text-[4.5vw] lg:text-[3vw] text-[#e0e0e0] cursor-pointer"></i>
+            <i className="ri-github-fill text-[4.5vw] lg:text-[3vw] text-[#e0e0e0] cursor-pointer"></i>
           </a>
           <a
             target="blank"
             href="https://www.linkedin.com/in/arjun-verma-5b4326292/"
           >
-            <i class="ri-linkedin-fill text-[4.5vw] lg:text-[3vw] text-[#e0e0e0] cursor-pointer"></i>
+            <i className="ri-linkedin-fill text-[4.5vw] lg:text-[3vw] text-[#e0e0e0] cursor-pointer"></i>
           </a>
           <h1 className="text-[#e0e0e0] text-sm lg:text-base">
             Crafted with ❤️ <br />
