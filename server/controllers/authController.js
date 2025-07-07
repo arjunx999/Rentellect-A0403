@@ -35,17 +35,13 @@ export const register = async (req, res) => {
   try {
     const { name, email, password, college } = req.body;
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ msg: "Username is already taken" });
-    }
     const existingMail = await User.findOne({ email });
     if (existingMail) {
       return res.status(409).json({ msg: "Email ID is already taken" });
     }
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
-    
+
     const newUser = new User({
       name,
       email,

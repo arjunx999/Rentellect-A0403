@@ -1,14 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SplashCursor from "../Components/SplashCursor";
 
 const SignUp = () => {
   const Navigate = useNavigate();
+
+  const [signupInfo, setSignupInfo] = useState({
+    name: "",
+    email: "",
+    password: "",
+    college: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSignupInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: value,
+    }));
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    const { name, email, password, college } = signupInfo;
+    if (!name || !email || !password || !college) {
+      return alert("Incomplete Credentials");
+    }
+    try {
+      const response = await fetch("http://localhost:9999/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signupInfo),
+      });
+
+      if (response.status == 409) {
+        return alert("User already exists with this mail. Login to continue");
+      }
+      alert("SignUp successful. Please login to continue.");
+      setTimeout(() => {
+        Navigate("/login");
+      }, 500);
+    } catch (error) {
+      console.error("Error during sign-up:", error);
+      alert("Something went wrong. Please try again later.");
+    }
+  };
+
   return (
     <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] flex flex-col lg:flex-row z-50">
-      <SplashCursor />
+      {/* <SplashCursor /> */}
       <div className="w-full h-[70%] lg:w-[45%] lg:h-full bg--400 flex">
         <form
+          onSubmit={handleSignup}
           action=""
           className="w-full h-full flex flex-col items-center justify-center gap-y-[2vh] font-[poppins]"
         >
@@ -16,21 +64,44 @@ const SignUp = () => {
             className="neu-input w-[70%] lg:w-[50%] "
             type="text"
             placeholder="name"
+            required
+            name="name"
+            value={signupInfo.name}
+            onChange={handleInputChange}
           />
           <input
             className="neu-input w-[70%] lg:w-[50%] "
-            type="text"
+            type="email"
             placeholder="email"
+            required
+            name="email"
+            value={signupInfo.email}
+            onChange={handleInputChange}
           />
-          <input
-            className="neu-input w-[70%] lg:w-[50%] "
-            type="text"
-            placeholder="password"
-          />
+          <div className="relative w-[70%] lg:w-[50%]">
+            <input
+              className="neu-input w-full pr-10"
+              type={showPassword ? "text" : "password"}
+              placeholder="password"
+              required
+              name="password"
+              value={signupInfo.password}
+              onChange={handleInputChange}
+            />
+            <i
+              className="ri-eye-fill absolute right-4.5 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+              onClick={() => setShowPassword((prev) => !prev)}
+              title={showPassword ? "Hide Password" : "Show Password"}
+            ></i>
+          </div>
           <input
             className="neu-input w-[70%] lg:w-[50%] "
             type="text"
             placeholder="college name"
+            required
+            name="college"
+            value={signupInfo.college}
+            onChange={handleInputChange}
           />
           <button
             className="neu-button-log font-semibold mt-3 lg:mt-1"

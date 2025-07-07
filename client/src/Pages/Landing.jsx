@@ -135,8 +135,8 @@ const Landing = () => {
           Why Choose Rentellect?
         </h1>
       </div>
-      <div className="w-[90%] h-auto lg:w-[95%] lg:h-[50vh] bg--400 mx-auto lg:mt-[1vh] lg:flex items-center justify-center gap-x-[1vw]">
-        <div className="neu-button w-[100%] h-[22vh] mt-[0.5vh] mb-[1.3vh] lg:w-[38%] lg:h-[95%] font-[poppins]">
+      <div className="w-[90%] h-auto lg:w-[95%] lg:h-[50vh] bg--400 mx-auto lg:mt-[1vh] lg:flex items-center justify-center gap-x-[1vw] mt-2 ">
+        <div className="neu-button w-[100%] h-auto py-4 lg:py-0 mt-[0.5vh] mb-[1.3vh] lg:w-[38%] lg:h-[95%] font-[poppins]">
           <h1 className="lg:text-4xl text-3xl text-gradient font-semibold lg:font-bold px-2 pb-0 lg:pb-2 pt-3">
             AI-Powered Book Verification
           </h1>
@@ -146,7 +146,7 @@ const Landing = () => {
             renting—no guesswork, no scams.
           </h2>
         </div>
-        <div className="neu-button w-[100%] h-[20vh] my-[1.3vh] lg:w-[29%] lg:h-[95%] font-[poppins]">
+        <div className="neu-button w-[100%] h-auto py-4 lg:py-0 my-[1.3vh] lg:w-[29%] lg:h-[95%] font-[poppins]">
           <h1 className="lg:text-4xl text-3xl text-gradient font-semibold lg:font-bold px-2 pb-0 lg:pb-2 pt-3">
             Direct & Safe Borrowing
           </h1>
@@ -155,7 +155,7 @@ const Landing = () => {
             middlemen, no unnecessary delays
           </h2>
         </div>
-        <div className="neu-button w-[100%] h-[20vh] my-[1.3vh] lg:w-[29%] lg:h-[95%] font-[poppins]">
+        <div className="neu-button w-[100%] h-auto py-4 lg:py-0 my-[1.3vh] lg:w-[29%] lg:h-[95%] font-[poppins]">
           <h1 className="lg:text-4xl text-3xl text-gradient font-semibold lg:font-bold px-2 pb-0 lg:pb-2 pt-3">
             Eco-Friendly & Budget-Smart
           </h1>
