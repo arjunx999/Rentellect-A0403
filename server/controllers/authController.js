@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { College } from "../models/college.js";
 import { User } from "../models/user.js";
 
 export const login = async (req, res) => {
@@ -39,13 +40,25 @@ export const register = async (req, res) => {
     if (existingMail) {
       return res.status(409).json({ msg: "Email ID is already taken" });
     }
+
+    const normalizedCollege = college
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    let existingCollege = await College.findOne({ name: normalizedCollege });
+    if (!existingCollege) {
+      const newCollege = new College({ name: normalizedCollege });
+      existingCollege = await newCollege.save();
+    }
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       name,
       email,
-      college,
+      college: existingCollege._id,
       password: passwordHash,
     });
     const savedUser = await newUser.save();

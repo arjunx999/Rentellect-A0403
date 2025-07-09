@@ -32,10 +32,9 @@ const userSchema = mongoose.Schema({
     },
   ],
   college: {
-    type: String,
-    require: true,
-    min: 5,
-    max: 50,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "College",
+    required: true,
   },
 });
 

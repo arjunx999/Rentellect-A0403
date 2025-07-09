@@ -49,7 +49,7 @@ const Login = () => {
       const { success, token, user } = data;
       if (success) {
         sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", user);
+        sessionStorage.setItem("user", JSON.stringify(user));
         alert("Login successful!");
         setTimeout(() => {
           Navigate("/home");

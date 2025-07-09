@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 // import uploadRoutes from "./routes/uploadRoutes.js";
 import { Message } from "./models/message.js";
+import collegeRoutes from "./routes/collegeRoutes.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/book", bookRoutes);
 app.use("/messages", messageRoutes);
+app.use("/colleges", collegeRoutes);
 
 const onlineUsers = new Map();
 

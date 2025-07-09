@@ -1,10 +1,15 @@
 import { Book } from "../models/book.js";
 import Razorpay from "razorpay";
 import { User } from "../models/user.js";
+import { College } from "../models/college.js";
 
 export const listBook = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    
     const { title, author, price, isbn, rental_time } = req.body;
     const imageUrls = req.files.map((file) => file.path);
 
@@ -16,6 +21,7 @@ export const listBook = async (req, res) => {
       isbn,
       rental_time,
       photos: imageUrls,
+      college: user.college,
     });
 
     const savedBook = await newBook.save();
