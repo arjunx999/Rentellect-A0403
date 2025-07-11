@@ -38,8 +38,8 @@ const bookSchema = mongoose.Schema({
   },
   condition: {
     type: String,
-    enum: ["good", "fair", "poor"],
-    default: "good",
+    enum: ["Good", "Fair", "Poor"],
+    default: "Fair",
   },
   photos: [
     {

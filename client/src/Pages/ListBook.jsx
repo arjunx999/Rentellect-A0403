@@ -11,9 +11,15 @@ const ListBook = () => {
     price: "",
     isbn: "",
     rental_time: "",
+    condition: "",
   });
   const [images, setImages] = useState([]);
   const token = sessionStorage.getItem("token");
+
+  const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [predictionResult, setPredictionResult] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -83,10 +89,10 @@ const ListBook = () => {
       }
     }
 
-    console.log("🔍 Confidence breakdown (sum of all 4 images):");
-    Object.entries(classScores).forEach(([name, score]) => {
-      console.log(`${name}: ${((score / 4) * 100).toFixed(2)}%`);
-    });
+    // console.log("🔍 Confidence breakdown (sum of all 4 images):");
+    // Object.entries(classScores).forEach(([name, score]) => {
+    //   console.log(`${name}: ${((score / 4) * 100).toFixed(2)}%`);
+    // });
 
     return {
       className: predictedClass,
@@ -103,7 +109,7 @@ const ListBook = () => {
     setImages(files);
   };
 
-  const handleSubmit = async (e) => {
+  const handlePredict = async (e) => {
     e.preventDefault();
 
     if (images.length !== 4) {
@@ -111,34 +117,58 @@ const ListBook = () => {
       return;
     }
 
+    setShowModal(true);
+    setIsLoading(true);
+
     const prediction = await predictCondition(images);
-    console.log("Predicted Book Condition:", prediction.className);
-    console.log("Confidence:", prediction.confidence.toFixed(2) + "%");
+    // console.log("Predicted Book Condition:", prediction.className);
+    // console.log("Confidence:", prediction.confidence.toFixed(2) + "%");
 
-    // const data = new FormData();
-    // Object.entries(formData).forEach(([key, value]) => {
-    //   data.append(key, value);
-    // });
+    setPredictionResult(prediction);
+    setFormData((prev) => ({
+      ...prev,
+      condition: prediction.className,
+    }));
+    setIsLoading(false);
+  };
 
-    // images.forEach((img) => data.append("bookImages", img));
+  const resetImages = () => {
+    setImages([]);
+    setPredictionResult(null);
+    setShowModal(false);
+  };
 
-    // try {
-    //   const res = await axios.post(
-    //     "http://localhost:9999/book/list-new",
-    //     data,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     }
-    //   );
-    //   alert("Book listed successfully!");
-    //   console.log(res.data);
-    // } catch (err) {
-    //   console.error("Error listing book:", err);
-    //   alert("Error listing book.");
-    // }
+  const submitListing = async () => {
+    setIsSubmitting(true);
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+    images.forEach((img) => data.append("bookImages", img));
+
+    try {
+      const res = await axios.post(
+        "http://localhost:9999/book/list-new",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert("Book listed successfully!");
+      // console.log(res.data);
+      setShowModal(false);
+      Navigate("/home");
+    } catch (err) {
+      console.error("Error listing book:", err);
+      alert("Error listing book.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -157,7 +187,7 @@ const ListBook = () => {
         </h1>
       </div>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handlePredict}
         className="w-[80%] h-[80%] b3--300 flex flex- gap-4"
       >
         <div className="w-[50%] h-full flex flex-col px-[3vw] gap-[2vh] justify-center">
@@ -167,7 +197,7 @@ const ListBook = () => {
             placeholder="Book Title"
             value={formData.title}
             onChange={handleChange}
-            // required
+            required
             className="neu-input"
           />
           <input
@@ -176,7 +206,7 @@ const ListBook = () => {
             placeholder="Author"
             value={formData.author}
             onChange={handleChange}
-            // required
+            required
             className="neu-input"
           />
           <input
@@ -185,7 +215,7 @@ const ListBook = () => {
             placeholder="Price (in ₹)"
             value={formData.price}
             onChange={handleChange}
-            // required
+            required
             className="neu-input"
           />
           <input
@@ -195,7 +225,7 @@ const ListBook = () => {
             value={formData.isbn}
             onChange={handleChange}
             className="neu-input"
-            // required
+            required
           />
           <input
             type="number"
@@ -204,7 +234,7 @@ const ListBook = () => {
             value={formData.rental_time}
             onChange={handleChange}
             className="neu-input"
-            // required
+            required
           />
           <button
             type="submit"
@@ -248,12 +278,60 @@ const ListBook = () => {
             // required
             className="neu-input mt-[2vh]"
           />
-          <h1 className="text-gray-700 text-sm">
+          <h1 className="text-gray-800 text-sm">
             *Note: For best results, take photos against a white background and
             upload them in the specified order.
           </h1>
         </div>
       </form>
+
+      {/* Modal for Prediction */}
+      {showModal && (
+        <div className="fixed inset-0 bg--500 font-[poppins] backdrop-blur-[5px] flex items-center justify-center z-50">
+          <div className="neu-box-l h-[50vh] flex flex-col items-center justify-center rounded-xl p-[5vh] shadow-lg w-[90vw] max-w-md text-center">
+            {isLoading || isSubmitting ? (
+              <>
+                <div className="loader mb-4"></div>
+                <h2 className="text-2xl font-bold mt-4 text-gray-800">
+                  {isLoading
+                    ? "Getting condition predicted by our trained model..."
+                    : "Submitting your book listing..."}
+                </h2>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                  Predicted Book Condition :
+                </h2>
+                <p className="text-3xl text-gradient font-semibold">
+                  {predictionResult.className}
+                </p>
+                <p className="text-lg font-semibold text-gray-500 mb-4">
+                  Confidence:{" "}
+                  <span className="text-gradient">
+                    {predictionResult.confidence.toFixed(2)}%
+                  </span>
+                </p>
+
+                <div className="font-semibold flex justify-center gap-4 mt-3">
+                  <button
+                    onClick={submitListing}
+                    className=" text-gradient px-4 py-2 rounded neu-button-log"
+                  >
+                    Submit Listing
+                  </button>
+                  <button
+                    onClick={resetImages}
+                    className=" px-4 py-2 rounded neu-button-log"
+                  >
+                    Take Pictures Again
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

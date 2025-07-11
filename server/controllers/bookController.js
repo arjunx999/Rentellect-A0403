@@ -9,8 +9,8 @@ export const listBook = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-    
-    const { title, author, price, isbn, rental_time } = req.body;
+
+    const { title, author, price, isbn, rental_time, condition } = req.body;
     const imageUrls = req.files.map((file) => file.path);
 
     const newBook = new Book({
@@ -20,6 +20,7 @@ export const listBook = async (req, res) => {
       price,
       isbn,
       rental_time,
+      condition,
       photos: imageUrls,
       college: user.college,
     });

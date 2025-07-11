@@ -28,13 +28,13 @@ const Home = () => {
             }
           );
           setColleges(collegesRes.data);
-          console.log(collegesRes.data);
+          // console.log(collegesRes.data);
 
           const booksRes = await axios.get("http://localhost:9999/book/", {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           setBooks(booksRes.data);
-          console.log(booksRes.data);
+          // console.log(booksRes.data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -61,20 +61,20 @@ const Home = () => {
         <img className="w-[40vw] lg:w-[13vw] mr-0" src={logo} alt="logo" />
         <div className="w- h-[80%] bg--400 flex items-center justify-center gap-x-3">
           <button className="w-[3.2vw] h-[3.2vw] rounded-full chat-icon bg-pink-400">
-            <i class="ri-chat-1-line text-xl font-medium"></i>
+            <i className="ri-chat-1-line text-xl font-medium"></i>
           </button>
           <button
             onClick={() => Navigate("/list-book")}
             className="neu-button-log text-sm font-semibold font-[poppins] "
           >
-            {/* <i class="ri-add-circle-line pr-2"></i> */}
+            {/* <i className="ri-add-circle-line pr-2"></i> */}
             <span className="text-gradient">List a Book</span>
           </button>
           <button
             onClick={() => Navigate(`/admin/${user._id}`)}
             className="neu-button-log text-sm font-semibold font-[poppins] text-gradient"
           >
-            {/* <i class="ri-user-fill"></i> */}
+            {/* <i className="ri-user-fill"></i> */}
             Dashboard
           </button>
         </div>
@@ -136,7 +136,7 @@ const Home = () => {
             className="p-2 rounded-lg border w-[60%] h-[70%] text-xs neu-input font-[poppins] "
           />
           <button className="w-[3.8vw] h-[3.2vw] rounded-full chat-icon bg-pink-400">
-            <i class="ri-search-2-line text-gradient font-semibold "></i>
+            <i className="ri-search-2-line text-gradient font-semibold "></i>
           </button>
         </div>
       </div>
