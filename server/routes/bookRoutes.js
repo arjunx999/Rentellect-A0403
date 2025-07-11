@@ -14,7 +14,7 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 // list new book
-router.post("/list-new", verifyToken, upload.array("bookImages", 4), listBook);
+router.post("/list-new", verifyToken, upload.array("bookImages", 2), listBook);
 // "bookImages" should match the form field name in the frontend
 
 // delete a listing
@@ -30,9 +30,9 @@ router.get("/", verifyToken, getBooks);
 router.get("/:id", verifyToken, getBookById);
 
 // rent a book
-router.post("/rent-book", verifyToken, rentBook)
+router.post("/rent-book", verifyToken, rentBook);
 
 // return a book
-router.patch("/return-book/:id", verifyToken, bookReturn)
+router.patch("/return-book/:id", verifyToken, bookReturn);
 
 export default router;

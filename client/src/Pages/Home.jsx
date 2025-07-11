@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import BookCard from "../Components/BookCard";
 
 const Home = () => {
   const Navigate = useNavigate();
@@ -141,7 +142,14 @@ const Home = () => {
       </div>
 
       {/* Books */}
-      <div className="w-[95%] h-[180vh] bg-lime-300 mx-auto"></div>
+      <div className="w-[95%] min-h-[60vh] mt-[2vh] bg--300 mx-auto flex flex-wrap justify- gap-y-[3vh] justify-start gap-x-[1.33%]">
+        <BookCard />
+        <BookCard />
+        <BookCard />
+        <BookCard />
+        <BookCard />
+        <BookCard />
+      </div>
 
       {/* Footer */}
       <div className="w-full lg:h-[35vh] bg-gray-900 mx-auto flex overflow-hidden mt-[3vh] lg:mt-[10vh] rounded-t-[70px] ">
