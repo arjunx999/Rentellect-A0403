@@ -54,8 +54,29 @@ const Home = () => {
       </div>
     );
 
+  const handleLogout = () => {
+    const confirmed = window.confirm("Are you sure you want to logout?");
+    if (confirmed) {
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      Navigate("/");
+    }
+  };
+
   return (
-    <div className="w-[100vw] min-h-[100vh] bg-[#e0e0e0] overflow-x-hidden overflow-y-auto">
+    <div className="w-[100vw] min-h-[100vh] bg-[#e0e0e0] overflow-x-hidden overflow-y-auto relative">
+      <div className="group fixed bottom-5 left-5 z-50">
+        <button
+          className="bg-[#e0e0e0]/80 backdrop-blur-md border-2 border-gray-900 px-2 lg:px-2.5 py-1 lg:py-1.5 rounded-full text-sm font-semibold font-[poppins] text-gradient btn hover:scale-110"
+          onClick={handleLogout}
+        >
+          <i className="ri-logout-circle-line text-xl font-medium"></i>
+        </button>
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+          Logout
+        </div>
+      </div>
+
       {/* Navbar */}
       <div className="w-full h-[8vh] lg:h-[12vh] bg--300 flex items-center justify-between px-[4vw] lg:px-[4vw] ">
         <img className="w-[40vw] lg:w-[13vw] mr-0" src={logo} alt="logo" />
