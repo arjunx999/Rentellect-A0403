@@ -20,6 +20,7 @@ const ListBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [predictionResult, setPredictionResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -41,8 +42,26 @@ const ListBook = () => {
   };
 
   useEffect(() => {
-    loadModel();
-  }, []);
+    const storedUser = sessionStorage.getItem("user");
+    const storedToken = sessionStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      loadModel();
+      setUser(storedUser);
+    } else {
+      setTimeout(() => {
+        alert("Please login to access this page");
+        Navigate("/login");
+      }, 500);
+    }
+  }, [Navigate]);
+
+  if (!user)
+    return (
+      <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] text-8xl font-black flex items-center justify-center font-[poppins]">
+        Login to access
+      </div>
+    );
 
   const fileToImage = (file) => {
     return new Promise((resolve) => {
@@ -173,12 +192,12 @@ const ListBook = () => {
 
   return (
     <div
-      className="w-[100vw] h-[100vh] bg-[#e0e0e0] flex flex-col font-[poppins]
+      className="w-[100vw] lg:h-[100vh] bg-[#e0e0e0] flex flex-col font-[poppins]
      bg--300 items-center justify-center relative"
     >
       <div
         onClick={() => Navigate(-1)}
-        className=" absolute left-[4vh] top-[4vh] flex items-center gap-x-[2vw] "
+        className=" absolute left-[4vh] top-[4vh] flex items-center gap-x-[4vw] lg:gap-x-[5vw]"
       >
         {" "}
         <i className="chat-icon ri-close-line text-xl font-bold  rounded-full py-2 px-3"></i>
@@ -188,9 +207,9 @@ const ListBook = () => {
       </div>
       <form
         onSubmit={handlePredict}
-        className="w-[80%] h-[80%] b3--300 flex flex- gap-4"
+        className="w-[80%] h-auto my-[13vh] lg:h-[80%] bg--300 flex flex-col lg:flex-row gap-4"
       >
-        <div className="w-[50%] h-full flex flex-col px-[3vw] gap-[2vh] justify-center">
+        <div className="lg:w-[50%] h-full flex flex-col px-[3vw] gap-[2vh] justify-center">
           <input
             type="text"
             name="title"
@@ -245,7 +264,7 @@ const ListBook = () => {
           </button>
         </div>
 
-        <div className="w-[50%] h-[100%] flex flex-col px-[3vw] gap-[2vh] justify-center">
+        <div className="w-full lg:w-[50%] h-[100%] flex flex-col px-[3vw] gap-[2vh] justify-center">
           {/* 📷 Image Guidance Grid */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             {["Front Cover", "Back Cover", "Spine", "Pages Sample"].map(

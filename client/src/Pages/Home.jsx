@@ -60,32 +60,35 @@ const Home = () => {
       <div className="w-full h-[8vh] lg:h-[12vh] bg--300 flex items-center justify-between px-[4vw] lg:px-[4vw] ">
         <img className="w-[40vw] lg:w-[13vw] mr-0" src={logo} alt="logo" />
         <div className="w- h-[80%] bg--400 flex items-center justify-center gap-x-3">
-          <button className="w-[3.2vw] h-[3.2vw] rounded-full chat-icon bg-pink-400">
+          <button className="chat-icon px-2 lg:px-2.5 py-1 lg:py-1.5 rounded-full text-sm font-semibold font-[poppins] text-gradient">
             <i className="ri-chat-1-line text-xl font-medium"></i>
           </button>
           <button
             onClick={() => Navigate("/list-book")}
-            className="neu-button-log text-sm font-semibold font-[poppins] "
+            className="chat-icon px-2 lg:px-5 py-1 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] flex items-center gap-1 text-gradient"
           >
-            {/* <i className="ri-add-circle-line pr-2"></i> */}
-            <span className="text-gradient">List a Book</span>
+            <i className="ri-add-circle-line text-xl block lg:hidden"></i>
+
+            <span className="hidden lg:inline">List a Book</span>
           </button>
+
           <button
             onClick={() => Navigate(`/admin/${user._id}`)}
-            className="neu-button-log text-sm font-semibold font-[poppins] text-gradient"
+            className="chat-icon px-2 lg:px-5 py-1 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] text-gradient"
           >
-            {/* <i className="ri-user-fill"></i> */}
-            Dashboard
+            <i className="ri-user-3-line text-xl block lg:hidden"></i>
+
+            <span className="hidden lg:inline text-gradient">Dashboard</span>
           </button>
         </div>
       </div>
 
       {/* Title */}
-      <div className="w-[95%] h-[8vh] bg--400 mx-auto flex flex-col items-center justify-center lg:h-[32vh] lg:mt-[3.3vh] relative">
-        <h1 className="font-[poppins] text-[15vw] lg:text-[6vw] font-black ">
+      <div className="w-[95%] h-[15vh] bg--400 mx-auto flex flex-col items-center justify-center lg:h-[32vh] lg:mt-[3.3vh] relative">
+        <h1 className="font-[poppins] text-[6vw] lg:text-[6vw] font-black ">
           Affordable books. Zero hassle.
         </h1>
-        <h1 className="font-[poppins] text-[15vw] -mt-[5vh] lg:text-[5.1vw] font-black ">
+        <h1 className="font-[poppins] text-[5.5vw] -mt-[0.5vh] lg:-mt-[5vh] lg:text-[5.1vw] font-black ">
           All on your campus.
         </h1>
       </div>
@@ -109,16 +112,20 @@ const Home = () => {
       >
         {/* <h2 className="font-[poppins] text-3xl font-bold ">Top Shelf Reads</h2> */}
         <span className="relative inline-block z-0">
-          <span className="font-[poppins] text-3xl font-semibold relative z-10">
-            Top Shelf Reads
+          <span className="font-[poppins] text-[5vw] lg:text-3xl font-semibold relative z-10">
+            Top Shelf
+            <br className="block lg:hidden" />
+            <span className="hidden lg:inline"> </span>
+            Reads
           </span>
+
           <span className="absolute inset-0 bg-green-300 opacity-40 z-0 rounded-sm -skew-y-1"></span>
         </span>
-        <div className="w-[30%] h-full bg--400 flex items-center gap-x-[1vw] justify-end">
+        <div className="w-[60%] lg:w-[30%] h-full bg--400 flex items-center gap-x-[1vw] justify-end">
           <select
             // value={selectedFilter}
             // onChange={(e) => setSelectedFilter(e.target.value)}
-            className=" rounded-lg border text-xs w-[36%] h-[70%] font-[poppins] neu-drop text-center"
+            className=" rounded-lg border text-[2.5vw] lg:text-xs w-[40%] h-[40%] lg:w-[36%] lg:h-[70%] font-[poppins] neu-drop text-center"
           >
             <option value="all">all colleges</option>
             {colleges?.map((college) => (
@@ -133,9 +140,9 @@ const Home = () => {
             // value={searchQuery}
             // onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search books by name..."
-            className="p-2 rounded-lg border w-[60%] h-[70%] text-xs neu-input font-[poppins] "
+            className="lg:p-2 rounded-lg border w-[40%] lg:w-[60%] h-[45%] lg:h-[70%] text-xs neu-input font-[poppins] "
           />
-          <button className="w-[3.8vw] h-[3.2vw] rounded-full chat-icon bg-pink-400">
+          <button className="chat-icon px-2 lg:px-3 py-1.5 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] flex items-center gap-1 text-gradient">
             <i className="ri-search-2-line text-gradient font-semibold "></i>
           </button>
         </div>
