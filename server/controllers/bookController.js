@@ -90,7 +90,7 @@ export const getBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await Book.findById(id).populate("owner", "name");
+    const book = await Book.findById(id).populate("owner", "name").populate("college", "name");
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }

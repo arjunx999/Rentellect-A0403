@@ -27,20 +27,26 @@ const BookCard = ({ book }) => {
     >
       <div className="w-[100%] h-[95%] rounded-4xl overflow-hidden bg--400 flex justify-start items-center flex-col">
         {/* Image Carousel */}
-        <div className="w-full h-[72%] relative rounded-[2rem] bg-red-300 overflow-hidden">
+        <div className="w-full h-[72%] relative rounded-[2rem] bg--300 overflow-hidden">
           <img
             src={book.photos[currentIndex]}
             alt={`Slide ${currentIndex + 1}`}
             className="w-full h-full object-cover rounded-[2rem]"
           />
           <button
-            onClick={handlePrev}
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePrev();
+            }}
             className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/30 hover:bg-white/70 rounded-full p-1"
           >
             <i className="ri-arrow-left-s-line text-2xl"></i>
           </button>
           <button
-            onClick={handleNext}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNext();
+            }}
             className="absolute top-1/2 right-4 -translate-y-1/2 bg-white/30 hover:bg-white/70 rounded-full p-1"
           >
             <i className="ri-arrow-right-s-line text-2xl"></i>
@@ -72,7 +78,7 @@ const BookCard = ({ book }) => {
         </div>
 
         {/* College */}
-        <div className="w-full text-lg font-semibold flex bg--400 flex-col items-center justify-center text-gray-500 border-t-1 pt-1">
+        <div className="w-full text-lg font-semibold flex bg--400 flex-col items-center justify-center text-gray-500 border-t-1 pt-1 capitalize">
           <h1>📍{book.college.name}</h1>
         </div>
       </div>
