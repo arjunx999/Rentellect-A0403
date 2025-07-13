@@ -79,6 +79,7 @@ export const getBooks = async (req, res) => {
   try {
     const books = await Book.find()
       .populate("owner", "name")
+      .populate("college", "name")
       .sort({ createdAt: -1 });
     res.status(200).json(books);
   } catch (error) {

@@ -171,12 +171,9 @@ const Home = () => {
 
       {/* Books */}
       <div className="w-[95%] min-h-[60vh] mt-[2vh] bg--300 mx-auto flex flex-wrap justify- gap-y-[3vh] justify-start gap-x-[1.33%]">
-        <BookCard />
-        <BookCard />
-        <BookCard />
-        <BookCard />
-        <BookCard />
-        <BookCard />
+        {books.map((book) => (
+          <BookCard key={book._id} book={book} />
+        ))}
       </div>
 
       {/* Footer */}
