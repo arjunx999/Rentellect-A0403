@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { all } from "axios";
 import BookCard from "../Components/BookCard";
 
 const Home = () => {
@@ -9,7 +9,10 @@ const Home = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [colleges, setColleges] = useState([]);
+  const [allBooks, setAllBooks] = useState([]);
   const [books, setBooks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +36,7 @@ const Home = () => {
           const booksRes = await axios.get("http://localhost:9999/book/", {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
+          setAllBooks(booksRes.data);
           setBooks(booksRes.data);
           // console.log(booksRes.data);
         } catch (error) {
@@ -47,6 +51,42 @@ const Home = () => {
     };
     fetchData();
   }, [Navigate]);
+
+  useEffect(() => {
+    if (searchQuery === "") {
+      setBooks(allBooks);
+    }
+  }, [searchQuery, allBooks]);
+
+  useEffect(() => {
+    const fetchBooksByCollege = async () => {
+      if (selectedFilter && selectedFilter !== "all" && token) {
+        try {
+          const booksRes = await axios.get(
+            `http://localhost:9999/book/get-by-college/${selectedFilter}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          setBooks(booksRes.data);
+          // console.log(booksRes.status)
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            alert("No books found for the selected college.");
+            setSelectedFilter("all");
+          } else {
+            console.error("Error fetching books by college:", error);
+          }
+        }
+      } else {
+        // fallback to all books
+        setBooks(allBooks);
+      }
+    };
+
+    fetchBooksByCollege();
+  }, [selectedFilter, token, allBooks]);
+
   if (!user)
     return (
       <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] text-8xl font-black flex items-center justify-center font-[poppins]">
@@ -61,6 +101,13 @@ const Home = () => {
       sessionStorage.removeItem("token");
       Navigate("/");
     }
+  };
+
+  const handleSearch = () => {
+    const filtered = allBooks.filter((book) =>
+      book.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setBooks(filtered);
   };
 
   return (
@@ -144,8 +191,8 @@ const Home = () => {
         </span>
         <div className="w-[60%] lg:w-[30%] h-full bg--400 flex items-center gap-x-[1vw] justify-end">
           <select
-            // value={selectedFilter}
-            // onChange={(e) => setSelectedFilter(e.target.value)}
+            value={selectedFilter}
+            onChange={(e) => setSelectedFilter(e.target.value)}
             className=" rounded-lg border text-[2.5vw] lg:text-xs w-[40%] h-[40%] lg:w-[36%] lg:h-[70%] font-[poppins] neu-drop text-center"
           >
             <option value="all">all colleges</option>
@@ -158,12 +205,15 @@ const Home = () => {
 
           <input
             type="text"
-            // value={searchQuery}
-            // onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search books by name..."
             className="lg:p-2 rounded-lg border w-[40%] lg:w-[60%] h-[45%] lg:h-[70%] text-xs neu-input font-[poppins] "
           />
-          <button className="chat-icon px-2 lg:px-3 py-1.5 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] flex items-center gap-1 text-gradient">
+          <button
+            onClick={handleSearch}
+            className="chat-icon px-2 lg:px-3 py-1.5 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] flex items-center gap-1 text-gradient"
+          >
             <i className="ri-search-2-line text-gradient font-semibold "></i>
           </button>
         </div>

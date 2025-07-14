@@ -32,7 +32,7 @@ const ViewBook = () => {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           setBook(bookinfo.data);
-          console.log(bookinfo.data);
+          // console.log(bookinfo.data);
         } catch (error) {
           alert("Error: Please check console");
           console.error("Error fetching book:", error);
@@ -60,7 +60,7 @@ const ViewBook = () => {
     return "text-gray-500";
   };
   return book ? (
-    <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] relative flex items-center justify-center px-[5vw]">
+    <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] relative flex flex-col lg:flex-row items-center justify-center px-[5vw]">
       <div
         onClick={() => Navigate(-1)}
         className="absolute left-[4vh] top-[4vh] flex items-center gap-x-[4vw] lg:gap-x-[5vw]"
@@ -68,7 +68,7 @@ const ViewBook = () => {
         <i className="chat-icon ri-close-line text-xl font-bold rounded-full py-2 px-3"></i>
       </div>
 
-      <div className="w-[50%] h-[80%] relative p-[1vw] flex items-center justify-center overflow-auto rounded-[1rem]">
+      <div className="w-[75%] lg:w-[50%] h-[80%] relative mt-15 lg:mt-0 lg:p-[1vw] flex items-center justify-center overflow-auto rounded-[1rem]">
         <img
           src={book.photos?.[currentIndex]}
           alt={`Slide ${currentIndex + 1}`}
@@ -94,12 +94,12 @@ const ViewBook = () => {
         </button>
       </div>
 
-      <div className="w-[50%] h-[80%] bg--700 -[1px] p-[1vw] font-[poppins]">
-        <h1 className="text-[3vw] font-semibold leading-11 text-gray-900 ">
+      <div className="w-[75%] lg:w-[50%] h-[80%] bg--700 -[1px] p-[1vw] font-[poppins]">
+        <h1 className="text-[3vw] font-semibold leading-11 text-gray-900 capitalize">
           {book.title}
         </h1>
         <h1 className="text-xl mt-3 border-t-1 border-black pt-3 text-left font-semibold text-gray-800">
-          By: {book.author}
+          Author: {book.author}
         </h1>
         <h1 className="w-[50%] text-lg mt-1 font-semibold text-gray-600">
           ISBN: {book.isbn}
@@ -110,13 +110,16 @@ const ViewBook = () => {
         <h1 className="mt-2 text-xl font-bold text-zinc-800">
           Condition: <span className={`${getBgColor()}`}>{book.condition}</span>
         </h1>
-        <h1 className="mt-1 text-lg font-semibold text-zinc-800">
+        <h1 className="mt-1 text-lg font-semibold text-zinc-700">
           Rental Period: {book.rental_time} days
         </h1>
-        <h1 className="text-lg font-semibold text-zinc-800 capitalize ">
+        <h1 className="mt-1 text-lg font-semibold text-zinc-700 capitalize">
           Location: {book.college.name}
         </h1>
-        <h1 className="text-lg font-semibold text-zinc-800 ">
+        <h1 className="text-lg font-semibold text-zinc-700 ">
+          Owner: {book.owner.name}
+        </h1>
+        <h1 className="text-lg font-semibold text-zinc-700 ">
           Listed on:{" "}
           {book.createdAt &&
             new Date(book.createdAt).toLocaleDateString("en-IN", {

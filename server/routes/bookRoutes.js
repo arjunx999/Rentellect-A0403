@@ -7,6 +7,7 @@ import {
   getBooks,
   listBook,
   rentBook,
+  getBooksByCollege,
   saveCondition,
 } from "../controllers/bookController.js";
 import { verifyToken } from "../middleware/auth.js";
@@ -28,6 +29,9 @@ router.get("/", verifyToken, getBooks);
 
 // get book by id
 router.get("/:id", verifyToken, getBookById);
+
+// get book by college
+router.get("/get-by-college/:collegeid", verifyToken, getBooksByCollege);
 
 // rent a book
 router.post("/rent-book", verifyToken, rentBook);

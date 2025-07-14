@@ -90,11 +90,33 @@ export const getBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await Book.findById(id).populate("owner", "name").populate("college", "name");
+    const book = await Book.findById(id)
+      .populate("owner", "name")
+      .populate("college", "name");
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
     res.status(200).json(book);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getBooksByCollege = async (req, res) => {
+  try {
+    const { collegeid } = req.params;
+    const college = await College.findById(collegeid);
+    const books = await Book.find({ college: collegeid })
+      .populate("owner", "name")
+      .populate("college", "name");
+
+    if (books.length === 0) {
+      return res.status(404).json({
+        message: "No books available for the selected college",
+      });
+    }
+
+    res.status(200).json(books);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
