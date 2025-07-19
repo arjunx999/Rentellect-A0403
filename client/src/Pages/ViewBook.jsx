@@ -34,8 +34,18 @@ const ViewBook = () => {
           setBook(bookinfo.data);
           // console.log(bookinfo.data);
         } catch (error) {
-          alert("Error: Please check console");
-          console.error("Error fetching book:", error);
+          if (error.response && error.response.status === 423) {
+            alert(
+              error.response.data.message || "Book transaction in process."
+            );
+            Navigate(-1);
+          } else if (error.response && error.response.status === 404) {
+            alert("Book not found");
+            Navigate(-1);
+          } else {
+            alert("An unexpected error occurred. Please check the console.");
+            console.error("Error fetching book:", error);
+          }
         }
       } else {
         setTimeout(() => {
@@ -132,7 +142,10 @@ const ViewBook = () => {
           <button className="chat-icon px-[5vw] py-[1.5vh] rounded-3xl text-lg font-bold">
             Text Owner
           </button>
-          <button className="chat-icon px-[5vw] py-[1.5vh] text-gradient rounded-3xl text-lg font-bold">
+          <button
+            onClick={() => Navigate(`/checkout/${book._id}`)}
+            className="chat-icon px-[5vw] py-[1.5vh] text-gradient rounded-3xl text-lg font-bold"
+          >
             Rent Now
           </button>
         </div>

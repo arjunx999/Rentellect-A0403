@@ -197,7 +197,7 @@ const ListBook = () => {
     >
       <div
         onClick={() => Navigate(-1)}
-        className=" absolute left-[4vh] top-[4vh] flex items-center gap-x-[4vw] lg:gap-x-[5vw]"
+        className=" absolute left-[4vh] top-[4vh] flex items-center gap-x-[4vw] lg:gap-x-[3vw]"
       >
         {" "}
         <i className="chat-icon ri-close-line text-xl font-bold  rounded-full py-2 px-3"></i>

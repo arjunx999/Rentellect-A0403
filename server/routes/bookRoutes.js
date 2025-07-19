@@ -9,6 +9,8 @@ import {
   rentBook,
   getBooksByCollege,
   saveCondition,
+  initiatePayment,
+  verifyPayment,
 } from "../controllers/bookController.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -35,6 +37,12 @@ router.get("/get-by-college/:collegeid", verifyToken, getBooksByCollege);
 
 // rent a book
 router.post("/rent-book", verifyToken, rentBook);
+
+// initiate payment
+router.post("/initiate-payment", verifyToken, initiatePayment);
+
+// verify payment
+router.post("/verify-payment", verifyToken, verifyPayment);
 
 // return a book
 router.patch("/return-book/:id", verifyToken, bookReturn);
