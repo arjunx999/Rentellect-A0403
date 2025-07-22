@@ -63,6 +63,67 @@ const ViewBook = () => {
       </div>
     );
 
+  const handlePaymentInitiation = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:9999/book/initiate-payment",
+        {
+          amount: book.amount,
+          bookId: id,
+          tenantId: user._id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const { order } = response.data;
+      console.log("Payment initiated:", order);
+
+      const options = {
+        key: "rzp_test_8aUEbFky0uBSqT",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Rentellect",
+        description: "Book Rent Payment",
+        order_id: order.id,
+        handler: async function (response) {
+          console.log("Payment successful:", response);
+
+          // Send payment verification data to server (optional but recommended)
+          await axios.post(
+            "http://localhost:9999/book/verify-payment",
+            {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              bookId: id,
+              tenantId: user._id,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          alert("Payment successful! Happy Reading!");
+          Navigate("/home");
+        },
+        prefill: {
+          name: user.username,
+          email: user.email,
+        },
+        theme: {
+          color: "#6366f1",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+    }
+  };
+
   const getBgColor = () => {
     if (book.condition === "Good") return "text-green-600";
     if (book.condition === "Fair") return "text-amber-600";
@@ -143,10 +204,23 @@ const ViewBook = () => {
             Text Owner
           </button>
           <button
-            onClick={() => Navigate(`/checkout/${book._id}`)}
+            // onClick={() => Navigate(`/checkout/${book._id}`)}
+            onClick={() => {
+              if (user._id === book.owner._id) {
+                alert("You cannot rent your own book.");
+                return;
+              }
+
+              const confirmProceed = window.confirm(
+                "Are you sure you want to proceed?\n\nThis action cannot be reversed once payment is successful."
+              );
+              if (confirmProceed) {
+                handlePaymentInitiation();
+              }
+            }}
             className="chat-icon px-[5vw] py-[1.5vh] text-gradient rounded-3xl text-lg font-bold"
           >
-            Rent Now
+            Pay Rent
           </button>
         </div>
       </div>

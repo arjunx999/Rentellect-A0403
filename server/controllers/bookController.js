@@ -198,11 +198,19 @@ export const verifyPayment = async (req, res) => {
       .digest("hex");
 
     if (expectedSignature === razorpay_signature) {
-      const book = await Book.findByIdAndUpdate(bookId, {
-        isPGOpen: false,
-        isRented: true,
-        tenant: user._id,
-      });
+      const book = await Book.findByIdAndUpdate(
+        bookId,
+        {
+          isPGOpen: false,
+          isRented: true,
+          tenant: user._id,
+          rentedAt: new Date(),
+        },
+        { new: true }
+      );
+
+      user.rented_books.push(book._id);
+      await user.save();
 
       return res
         .status(200)

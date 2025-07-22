@@ -52,6 +52,10 @@ const bookSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    rentedAt: {
+      type: Date,
+      default: null,
+    },
     college: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "College",
