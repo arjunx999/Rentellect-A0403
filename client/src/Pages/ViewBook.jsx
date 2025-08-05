@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 import { useParams } from "react-router-dom";
+import axios from "../api/axios";
 
 const ViewBook = () => {
   const Navigate = useNavigate();
@@ -9,6 +10,8 @@ const ViewBook = () => {
   const [token, setToken] = useState(null);
   const [book, setBook] = useState(null);
   const { id } = useParams();
+
+  const [chatBox, setChatBox] = useState(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlePrev = () => {
@@ -28,7 +31,7 @@ const ViewBook = () => {
         setUser(JSON.parse(storedUser));
         setToken(storedToken);
         try {
-          const bookinfo = await axios.get(`http://localhost:9999/book/${id}`, {
+          const bookinfo = await axios.get(`/book/${id}`, {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           setBook(bookinfo.data);
@@ -66,7 +69,7 @@ const ViewBook = () => {
   const handlePaymentInitiation = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:9999/book/initiate-payment",
+        "/book/initiate-payment",
         {
           amount: book.amount,
           bookId: id,
@@ -92,7 +95,7 @@ const ViewBook = () => {
 
           // Send payment verification data to server (optional but recommended)
           await axios.post(
-            "http://localhost:9999/book/verify-payment",
+            "/book/verify-payment",
             {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
@@ -165,65 +168,97 @@ const ViewBook = () => {
         </button>
       </div>
 
-      <div className="w-[75%] lg:w-[50%] h-[80%] bg--700 -[1px] p-[1vw] font-[poppins]">
-        <h1 className="text-[3vw] font-semibold leading-11 text-gray-900 capitalize">
-          {book.title}
-        </h1>
-        <h1 className="text-xl mt-3 border-t-1 border-black pt-3 text-left font-semibold text-gray-800">
-          Author: {book.author}
-        </h1>
-        <h1 className="w-[50%] text-lg mt-1 font-semibold text-gray-600">
-          ISBN: {book.isbn}
-        </h1>
-        <h1 className="mt-2 text-3xl font-black text-emerald-500">
-          ₹{book.price}
-        </h1>
-        <h1 className="mt-2 text-xl font-bold text-zinc-800">
-          Condition: <span className={`${getBgColor()}`}>{book.condition}</span>
-        </h1>
-        <h1 className="mt-1 text-lg font-semibold text-zinc-700">
-          Rental Period: {book.rental_time} days
-        </h1>
-        <h1 className="mt-1 text-lg font-semibold text-zinc-700 capitalize">
-          Location: {book.college.name}
-        </h1>
-        <h1 className="text-lg font-semibold text-zinc-700 ">
-          Owner: {book.owner.name}
-        </h1>
-        <h1 className="text-lg font-semibold text-zinc-700 ">
-          Listed on:{" "}
-          {book.createdAt &&
-            new Date(book.createdAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-        </h1>
-        <div className="flex mt-2 gap-3">
-          <button className="chat-icon px-[5vw] py-[1.5vh] rounded-3xl text-lg font-bold">
-            Text Owner
-          </button>
-          <button
-            // onClick={() => Navigate(`/checkout/${book._id}`)}
-            onClick={() => {
-              if (user._id === book.owner._id) {
-                alert("You cannot rent your own book.");
-                return;
-              }
-
-              const confirmProceed = window.confirm(
-                "Are you sure you want to proceed?\n\nThis action cannot be reversed once payment is successful."
-              );
-              if (confirmProceed) {
-                handlePaymentInitiation();
-              }
-            }}
-            className="chat-icon px-[5vw] py-[1.5vh] text-gradient rounded-3xl text-lg font-bold"
-          >
-            Pay Rent
-          </button>
+      {chatBox ? (
+        <div className="w-[75%] lg:w-[50%] h-[80%] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
+          <div className="w-full h-[10%] bg--400 border-b-[1.5px] border-gray-600 flex justify-between items-center px-7">
+            <h1 className="capitalize font-[poppins] text-zinc-900 ">
+              {book.owner.name} <span>( {book.college.name} )</span>
+            </h1>
+            <i
+              onClick={() => setChatBox(false)}
+              className="cursor-pointer ri-close-line text-xl font-bold"
+            ></i>
+          </div>
+          <div className="w-full h-[80%] bg--400"></div>
+          <form className="w-full h-[10%] bg--400 border-t-[1.5px] border-gray-600 flex justify-between">
+            <div className="w-[88%] h-full bg--400">
+              <input
+                type="text"
+                className="w-full h-full pl-7 focus:outline-none focus:ring-0"
+                placeholder="start typing your message here"
+              />
+            </div>
+            {/* <div className="w-[15%] h-full bg--400 border-l-[1.5px] border-gray-600"></div> */}
+            <button type="submit">
+              <i class="ri-send-plane-2-line mx-auto my-auto text-lg chat-icon rounded-full px-2 py-2 mr-3"></i>
+            </button>
+          </form>
         </div>
-      </div>
+      ) : (
+        <div className="w-[75%] lg:w-[50%] h-[80%] bg--700 -[1px] p-[1vw] font-[poppins]">
+          <h1 className="text-[3vw] font-semibold leading-11 text-gray-900 capitalize">
+            {book.title}
+          </h1>
+          <h1 className="text-xl mt-3 border-t-1 border-black pt-3 text-left font-semibold text-gray-800">
+            Author: {book.author}
+          </h1>
+          <h1 className="w-[50%] text-lg mt-1 font-semibold text-gray-600">
+            ISBN: {book.isbn}
+          </h1>
+          <h1 className="mt-2 text-3xl font-black text-emerald-500">
+            ₹{book.price}
+          </h1>
+          <h1 className="mt-2 text-xl font-bold text-zinc-800">
+            Condition:{" "}
+            <span className={`${getBgColor()}`}>{book.condition}</span>
+          </h1>
+          <h1 className="mt-1 text-lg font-semibold text-zinc-700">
+            Rental Period: {book.rental_time} days
+          </h1>
+          <h1 className="mt-1 text-lg font-semibold text-zinc-700 capitalize">
+            Location: {book.college.name}
+          </h1>
+          <h1 className="text-lg font-semibold text-zinc-700 ">
+            Owner: {book.owner.name}
+          </h1>
+          <h1 className="text-lg font-semibold text-zinc-700 ">
+            Listed on:{" "}
+            {book.createdAt &&
+              new Date(book.createdAt).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+          </h1>
+          <div className="flex mt-2 gap-3">
+            <button
+              onClick={() => setChatBox(true)}
+              className="chat-icon px-[5vw] py-[1.5vh] rounded-3xl text-lg font-bold"
+            >
+              Text Owner
+            </button>
+            <button
+              // onClick={() => Navigate(`/checkout/${book._id}`)}
+              onClick={() => {
+                if (user._id === book.owner._id) {
+                  alert("You cannot rent your own book.");
+                  return;
+                }
+
+                const confirmProceed = window.confirm(
+                  "Are you sure you want to proceed?\n\nThis action cannot be reversed once payment is successful."
+                );
+                if (confirmProceed) {
+                  handlePaymentInitiation();
+                }
+              }}
+              className="chat-icon px-[5vw] py-[1.5vh] text-gradient rounded-3xl text-lg font-bold"
+            >
+              Pay Rent
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   ) : (
     <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] flex items-center justify-center">

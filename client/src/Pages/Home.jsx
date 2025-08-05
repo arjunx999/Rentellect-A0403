@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
-import axios, { all } from "axios";
+// import axios, { all } from "axios";
+import axios from "../api/axios";
 import BookCard from "../Components/BookCard";
 
 const Home = () => {
@@ -63,7 +64,7 @@ const Home = () => {
       if (selectedFilter && selectedFilter !== "all" && token) {
         try {
           const booksRes = await axios.get(
-            `http://localhost:9999/book/get-by-college/${selectedFilter}`,
+            `/book/get-by-college/${selectedFilter}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }

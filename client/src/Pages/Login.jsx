@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import SplashCursor from "../Components/SplashCursor";
 import { useState } from "react";
+import axios from "../api/axios";
 
 const Login = () => {
   const Navigate = useNavigate();
@@ -31,22 +32,10 @@ const Login = () => {
       return alert("Incomplete Credentials");
     }
     try {
-      const response = await fetch("http://localhost:9999/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginInfo),
-      });
+      const response = await axios.post("/auth/login", loginInfo);
 
-      if (response.status == 404) {
-        return alert("User does not exists. Signup to continue");
-      }
-      if (response.status == 400) {
-        return alert("Incorrect password");
-      }
-      const data = await response.json();
-      const { success, token, user } = data;
+      const { success, token, user, message } = response.data;
+
       if (success) {
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("user", JSON.stringify(user));
@@ -58,8 +47,20 @@ const Login = () => {
         alert(message || "Log-in failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      alert("Something went wrong. Please try again later.");
+      if (error.response) {
+        const { status } = error.response;
+
+        if (status === 404) {
+          alert("User does not exist. Signup to continue");
+        } else if (status === 400) {
+          alert("Incorrect password");
+        } else {
+          alert("Login failed. Please try again.");
+        }
+      } else {
+        console.error("Error during login:", error);
+        alert("Something went wrong. Please try again later.");
+      }
     }
   };
 

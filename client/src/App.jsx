@@ -7,11 +7,11 @@ import Landing from "./Pages/Landing.jsx";
 import NotFound from "./Pages/NotFound.jsx";
 import ViewBook from "./Pages/ViewBook.jsx";
 import ListBook from "./Pages/ListBook.jsx";
-import Checkout from "./Pages/Checkout.jsx";
+// import Checkout from "./Pages/Checkout.jsx";
 import Admin from "./Pages/Admin.jsx";
 import LocomotiveScroll from "locomotive-scroll";
 const App = () => {
-  // const locomotiveScroll = new LocomotiveScroll();
+  const locomotiveScroll = new LocomotiveScroll();
 
   return (
     <>

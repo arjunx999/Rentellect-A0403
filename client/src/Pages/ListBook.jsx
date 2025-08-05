@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as tmImage from "@teachablemachine/image";
+import axios from "../api/axios";
 
 const ListBook = () => {
   const Navigate = useNavigate();
@@ -168,16 +169,12 @@ const ListBook = () => {
     images.forEach((img) => data.append("bookImages", img));
 
     try {
-      const res = await axios.post(
-        "http://localhost:9999/book/list-new",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.post("/book/list-new", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       alert("Book listed successfully!");
       // console.log(res.data);
       setShowModal(false);

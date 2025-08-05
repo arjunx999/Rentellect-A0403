@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SplashCursor from "../Components/SplashCursor";
+import axios from "../api/axios"
 
 const SignUp = () => {
   const Navigate = useNavigate();
@@ -30,24 +31,18 @@ const SignUp = () => {
       return alert("Incomplete Credentials");
     }
     try {
-      const response = await fetch("http://localhost:9999/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signupInfo),
-      });
-
-      if (response.status == 409) {
-        return alert("User already exists with this mail. Login to continue");
-      }
+      const response = await axios.post("/auth/signup", signupInfo);
       alert("SignUp successful. Please login to continue.");
       setTimeout(() => {
         Navigate("/login");
       }, 500);
     } catch (error) {
-      console.error("Error during sign-up:", error);
-      alert("Something went wrong. Please try again later.");
+      if (error.response && error.response.status === 409) {
+        alert("User already exists with this mail. Login to continue");
+      } else {
+        console.error("Error during sign-up:", error);
+        alert("Something went wrong. Please try again later.");
+      }
     }
   };
 
