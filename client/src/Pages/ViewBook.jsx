@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 import { useParams } from "react-router-dom";
 import axios from "../api/axios";
+import socket from "../socket";
 
 const ViewBook = () => {
   const Navigate = useNavigate();
@@ -12,6 +13,9 @@ const ViewBook = () => {
   const { id } = useParams();
 
   const [chatBox, setChatBox] = useState(false);
+
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlePrev = () => {
@@ -59,6 +63,36 @@ const ViewBook = () => {
     };
     fetchData();
   }, [id, Navigate]);
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.emit("user-connected", user._id);
+      console.log(user._id);
+    }
+  }, [user, chatBox]);
+
+  useEffect(() => {
+    const FetchMessages = async () => {
+      try {
+        if (!book.owner?._id) return;
+        const token = sessionStorage.getItem("token");
+        const res = await axios.get(
+          `/messages/get-messages/${book.owner._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setMessages(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log("error loading messages: ", error);
+      }
+    };
+    if (chatBox) {
+      FetchMessages();
+    }
+  }, [chatBox, book?.owner?._id]);
+
   if (!user)
     return (
       <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] text-8xl font-black flex items-center justify-center font-[poppins]">
@@ -133,6 +167,23 @@ const ViewBook = () => {
     if (book.condition === "Poor") return "text-red-500";
     return "text-gray-500";
   };
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (text.trim().length < 1) return;
+
+    const newMsg = {
+      receiverId: book.owner._id,
+      content: text,
+      senderId: user._id,
+    };
+
+    socket.emit("send-message", newMsg);
+    setMessages((prev) => [...prev, { ...newMsg, sender: user._id }]);
+    setText("");
+  };
+
   return book ? (
     <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] relative flex flex-col lg:flex-row items-center justify-center px-[5vw]">
       <div
@@ -179,18 +230,53 @@ const ViewBook = () => {
               className="cursor-pointer ri-close-line text-xl font-bold"
             ></i>
           </div>
-          <div className="w-full h-[80%] bg--400"></div>
-          <form className="w-full h-[10%] bg--400 border-t-[1.5px] border-gray-600 flex justify-between">
+          <div className="w-full h-[80%] bg--400 overflow-y-auto p-4 flex flex-col gap-2">
+            {messages.length === 0 && (
+              <div className="text-center text-zinc-400">No messages yet.</div>
+            )}
+            {messages.map((msg, idx) => {
+              const fromOwner =
+                msg.senderId === book.owner._id ||
+                msg.sender === book.owner._id;
+              const fromUser =
+                msg.senderId === user._id || msg.sender === user._id;
+              return (
+                <div
+                  key={idx}
+                  className={`flex ${
+                    fromUser ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`chat-icon2 max-w-[70%] px-4 py-2 rounded-lg shadow-sm ${
+                      fromUser
+                        ? "rounded-br-2xl rounded-tr-2xl"
+                        : "rounded-bl-2xl rounded-tl-2xl"
+                    }text-base`}
+                  >
+                    {msg.content}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <form
+            className="w-full h-[10%] bg--400 border-t-[1.5px] border-gray-600 flex justify-between"
+            onSubmit={handleSendMessage}
+          >
             <div className="w-[88%] h-full bg--400">
               <input
                 type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
                 className="w-full h-full pl-7 focus:outline-none focus:ring-0"
                 placeholder="start typing your message here"
               />
             </div>
             {/* <div className="w-[15%] h-full bg--400 border-l-[1.5px] border-gray-600"></div> */}
             <button type="submit">
-              <i class="ri-send-plane-2-line mx-auto my-auto text-lg chat-icon rounded-full px-2 py-2 mr-3"></i>
+              <i className="ri-send-plane-2-line mx-auto my-auto text-lg chat-icon rounded-full px-2 py-2 mr-3"></i>
             </button>
           </form>
         </div>
@@ -232,7 +318,13 @@ const ViewBook = () => {
           </h1>
           <div className="flex mt-2 gap-3">
             <button
-              onClick={() => setChatBox(true)}
+              onClick={() => {
+                if (user._id === book.owner._id) {
+                  alert("You cannot text yourself.");
+                  return;
+                }
+                setChatBox(true);
+              }}
               className="chat-icon px-[5vw] py-[1.5vh] rounded-3xl text-lg font-bold"
             >
               Text Owner

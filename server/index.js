@@ -48,6 +48,7 @@ io.on("connection", (socket) => {
   // client connection
   socket.on("user-connected", (userId) => {
     onlineUsers.set(userId, socket.id);
+    // console.log(socket.id)
   });
 
   // client disconnection

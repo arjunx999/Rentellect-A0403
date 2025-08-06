@@ -153,6 +153,13 @@ select.neu-drop {
   box-shadow: inset 3px 3px 10px #bcbcbc, inset -5px -5px 10px #ffffff;
 }
 
+.chat-icon2 {
+  background-color: #e0e0e0;
+  box-shadow: inset 3px 3px 10px #bcbcbc, inset -5px -5px 10px #ffffff;
+  color: #4d4d4d;
+  border: 2px solid rgb(206, 206, 206);
+}
+
 .btn {
   box-shadow: inset 2px 2px 5px #bcbcbc, inset -2px -2px 5px #ffffff,
     2px 2px 5px #bcbcbc, -2px -2px 5px #ffffff;
@@ -200,6 +207,10 @@ select.neu-drop {
   margin: 0 auto;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

@@ -6,9 +6,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: true, // ← allows external access (0.0.0.0)
+    host: true, 
     strictPort: true,
-    port: 5173, // or your custom port
-    allowedHosts: ['.loca.lt'] // ← allow all localtunnel subdomains
+    port: 5173,
+    // allowedHosts: ['.loca.lt'] // ← allow all localtunnel subdomains
   }
 });
