@@ -4,17 +4,20 @@ import {
   getUserConversations,
   ownerBooks,
   rentedBooks,
+  getAllUsers,
 } from "../controllers/userController.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/:id", getUser, verifyToken);
+router.get("/", verifyToken, getAllUsers)
 
-router.get("/getConversations", getUserConversations, verifyToken);
+router.get("/:id", verifyToken, getUser);
 
-router.get("/rentedBooks", rentedBooks, verifyToken);
+router.get("/getConversations/:userId", verifyToken, getUserConversations);
 
-router.get("/owner-stats", ownerBooks, verifyToken);
+router.get("/rentedBooks", verifyToken, rentedBooks);
+
+router.get("/owner-stats", verifyToken, ownerBooks);
 
 export default router;

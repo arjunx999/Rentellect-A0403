@@ -11,29 +11,46 @@ export const getUser = async (req, res) => {
   }
 };
 
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("-password")
+      .populate("college", "name");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    5;
+  }
+};
+
 export const getUserConversations = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.params.userId;
 
     const messages = await Message.find({
       $or: [{ sender: userId }, { receiver: userId }],
-    }).populate("sender receiver", "name email");
+    })
+      .sort({ timestamp: -1 })
+      .populate("sender", "name")
+      .populate("receiver", "name");
 
-    // Extract unique user IDs
-    const userMap = new Map();
+    const contacts = [];
+    const seen = new Set();
 
-    messages.forEach((msg) => {
-      const otherUser =
+    for (let msg of messages) {
+      let otherUser =
         msg.sender._id.toString() === userId ? msg.receiver : msg.sender;
 
-      userMap.set(otherUser._id.toString(), otherUser);
-    });
+      if (otherUser && !seen.has(otherUser._id.toString())) {
+        seen.add(otherUser._id.toString());
+        contacts.push({ id: otherUser._id, name: otherUser.name });
+      }
+    }
 
-    const uniqueUsers = Array.from(userMap.values());
-
-    res.status(200).json(uniqueUsers);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(200).json(contacts);
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

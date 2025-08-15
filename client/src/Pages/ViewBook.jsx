@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import axios from "../api/axios";
 import socket from "../socket";
+import { useRef } from "react";
 
 const ViewBook = () => {
   const Navigate = useNavigate();
@@ -25,6 +26,15 @@ const ViewBook = () => {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === book.photos.length - 1 ? 0 : prev + 1));
   };
+
+  const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,9 +77,25 @@ const ViewBook = () => {
   useEffect(() => {
     if (user?._id) {
       socket.emit("user-connected", user._id);
-      console.log(user._id);
+      // console.log(user._id);
     }
   }, [user, chatBox]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (text.trim().length < 1) return;
+
+    const newMsg = {
+      receiverId: book.owner._id,
+      content: text,
+      senderId: user._id,
+    };
+
+    socket.emit("send-message", newMsg);
+    setMessages((prev) => [...prev, { ...newMsg, sender: user._id }]);
+    setText("");
+  };
 
   useEffect(() => {
     const FetchMessages = async () => {
@@ -83,7 +109,7 @@ const ViewBook = () => {
           }
         );
         setMessages(res.data);
-        console.log(res.data);
+        // console.log(res.data);
       } catch (error) {
         console.log("error loading messages: ", error);
       }
@@ -91,7 +117,7 @@ const ViewBook = () => {
     if (chatBox) {
       FetchMessages();
     }
-  }, [chatBox, book?.owner?._id]);
+  }, [chatBox, book?.owner?._id, handleSendMessage]);
 
   if (!user)
     return (
@@ -168,22 +194,6 @@ const ViewBook = () => {
     return "text-gray-500";
   };
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-
-    if (text.trim().length < 1) return;
-
-    const newMsg = {
-      receiverId: book.owner._id,
-      content: text,
-      senderId: user._id,
-    };
-
-    socket.emit("send-message", newMsg);
-    setMessages((prev) => [...prev, { ...newMsg, sender: user._id }]);
-    setText("");
-  };
-
   return book ? (
     <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] relative flex flex-col lg:flex-row items-center justify-center px-[5vw]">
       <div
@@ -220,7 +230,7 @@ const ViewBook = () => {
       </div>
 
       {chatBox ? (
-        <div className="w-[75%] lg:w-[50%] h-[80%] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
+        <div className="w-[75%] lg:w-[50%] h-[100%] text-xs lg:text-sm lg:h-[80%] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
           <div className="w-full h-[10%] bg--400 border-b-[1.5px] border-gray-600 flex justify-between items-center px-7">
             <h1 className="capitalize font-[poppins] text-zinc-900 ">
               {book.owner.name} <span>( {book.college.name} )</span>
@@ -230,7 +240,10 @@ const ViewBook = () => {
               className="cursor-pointer ri-close-line text-xl font-bold"
             ></i>
           </div>
-          <div className="w-full h-[80%] bg--400 overflow-y-auto p-4 flex flex-col gap-2">
+          <div
+            className="w-full h-[80%] bg--400 overflow-y-auto p-4 flex flex-col gap-2"
+            ref={chatContainerRef}
+          >
             {messages.length === 0 && (
               <div className="text-center text-zinc-400">No messages yet.</div>
             )}

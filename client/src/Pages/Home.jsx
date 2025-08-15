@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 // import axios, { all } from "axios";
 import axios from "../api/axios";
 import BookCard from "../Components/BookCard";
+import socket from "../socket";
+import { useRef } from "react";
 
 const Home = () => {
   const Navigate = useNavigate();
@@ -14,6 +16,15 @@ const Home = () => {
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [chatBox, setChatBox] = useState(false);
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+  const [recentChats, setRecentChats] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,16 +36,13 @@ const Home = () => {
         setToken(storedToken);
         // console.log(user)
         try {
-          const collegesRes = await axios.get(
-            "http://localhost:9999/colleges/",
-            {
-              headers: { Authorization: `Bearer ${storedToken}` },
-            }
-          );
+          const collegesRes = await axios.get("/colleges", {
+            headers: { Authorization: `Bearer ${storedToken}` },
+          });
           setColleges(collegesRes.data);
           // console.log(collegesRes.data);
 
-          const booksRes = await axios.get("http://localhost:9999/book/", {
+          const booksRes = await axios.get("/book", {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           setAllBooks(booksRes.data);
@@ -64,13 +72,13 @@ const Home = () => {
       if (selectedFilter && selectedFilter !== "all" && token) {
         try {
           const booksRes = await axios.get(
-            `/book/get-by-college/${selectedFilter}`,
+            `book/get-by-college/${selectedFilter}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
           setBooks(booksRes.data);
-          // console.log(booksRes.status)
+          console.log(booksRes.data);
         } catch (error) {
           if (error.response && error.response.status === 404) {
             alert("No books found for the selected college.");
@@ -87,6 +95,116 @@ const Home = () => {
 
     fetchBooksByCollege();
   }, [selectedFilter, token, allBooks]);
+
+  useEffect(() => {
+    if (!token || users.length > 0) return;
+    const fetchAllusers = async () => {
+      try {
+        if (token) {
+          const res = await axios.get("/user/", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          // console.log(res.data);
+          setUsers(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAllusers();
+  }, [chatBox]);
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setFilteredUsers([]);
+    } else {
+      setFilteredUsers(
+        users.filter(
+          (u) =>
+            u._id !== user._id &&
+            u.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+  }, [query, users, user]);
+
+  const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (text.trim().length < 1) return;
+
+    const userId = selectedUser._id || selectedUser.id;
+    const newMsg = {
+      receiverId: userId,
+      content: text,
+      senderId: user._id,
+    };
+
+    socket.emit("send-message", newMsg);
+    setMessages((prev) => [...prev, { ...newMsg, sender: user._id }]);
+    setText("");
+  };
+
+  useEffect(() => {
+    socket.on("receive-message", (msg) => {
+      if (
+        selectedUser &&
+        (msg.senderId === selectedUser._id ||
+          msg.receiverId === selectedUser._id)
+      ) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    });
+    return () => socket.off("receive-message");
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (!selectedUser || !token) return;
+    const userId = selectedUser._id || selectedUser.id;
+
+    const fetchMessages = async () => {
+      try {
+        setLoadingMessages(true);
+        const res = await axios.get(`/messages/get-messages/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessages(res.data);
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    fetchMessages();
+  }, [selectedUser, token]);
+
+  useEffect(() => {
+    if (!token || !user) {
+      return;
+    }
+    const fetchUserConversations = async () => {
+      try {
+        const res = await axios.get(`user/getConversations/${user._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // console.log(res.data);
+        setRecentChats(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserConversations();
+  }, [user, chatBox, token]);
 
   if (!user)
     return (
@@ -129,7 +247,10 @@ const Home = () => {
       <div className="w-full h-[8vh] lg:h-[12vh] bg--300 flex items-center justify-between px-[4vw] lg:px-[4vw] ">
         <img className="w-[40vw] lg:w-[13vw] mr-0" src={logo} alt="logo" />
         <div className="w- h-[80%] bg--400 flex items-center justify-center gap-x-3">
-          <button className="chat-icon px-2 lg:px-2.5 py-1 lg:py-1.5 rounded-full text-sm font-semibold font-[poppins] text-gradient">
+          <button
+            className="chat-icon px-2 lg:px-2.5 py-1 lg:py-1.5 rounded-full text-sm font-semibold font-[poppins] text-gradient"
+            onClick={() => setChatBox(!chatBox)}
+          >
             <i className="ri-chat-1-line text-xl font-medium"></i>
           </button>
           <button
@@ -152,8 +273,137 @@ const Home = () => {
         </div>
       </div>
 
+      {chatBox && (
+        <div className="h-[88vh] absolute w-[90vw] lg:w-[55vw] chat-icon2 top-[11vh] right-[4vw] z-50 rounded-4xl flex overflow-hidden bg-[#e0e0e0] text-xs lg:text-sm">
+          <div className="w-[35%] h-full bg--500 border-r-[0.1rem] border-gray-600 flex flex-col">
+            <div className="w-full h-[10%] bg--300 border-b-[1.5px]">
+              <div className="relative w-full px-3 py-2">
+                {/* Search Input */}
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  className="w-full pl-10 pr-4 py-2  text-sm font-[poppins] rounded-lg focus:outline-none focus:ring-0"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <i className="ri-search-2-line absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+
+                {/* Dropdown */}
+                {filteredUsers.length > 0 && (
+                  <ul className="absolute z-20 mt-1 w-[90%] left-1/2 -translate-x-1/2 bg-[#e0e0e0] neu-drop rounded-lg shadow-lg max-h-48 overflow-y-auto text-sm">
+                    {filteredUsers.map((u) => (
+                      <li
+                        key={u._id}
+                        className="px-4 py-2 cursor-pointer hover:bg-indigo-200 transition"
+                        onClick={() => {
+                          setQuery(u.name);
+                          setSelectedUser(u);
+                          setFilteredUsers([]);
+                        }}
+                      >
+                        {u.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+            <div className="w-full h-[90%] bg--300 overflow-x-hidden overflow-y-scroll flex flex-col">
+              {recentChats.length === 0 && (
+                <div className="text-center text-zinc-400 my-auto">
+                  No recent chats.
+                </div>
+              )}
+              {recentChats.map((chat, index) => (
+                <div
+                  onClick={() => {
+                    // setMessages([]);
+                    setSelectedUser(chat);
+                  }}
+                  key={index}
+                  className="w-full h-[8vh] bg--300 font-[poppins] cursor-pointer hover:bg-indigo-200 border-b-[1.3px] flex items-center justify-start pl-5"
+                >
+                  {chat.name}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="w-[65%] h-full bg--500 flex flex-col">
+            <div className="w-full h-[10%] bg--300 border-b-[1.5px] flex justify-between items-center px-5">
+              <h1 className="capitalize font-[poppins] text-zinc-900 ">
+                {selectedUser
+                  ? selectedUser.name
+                  : "Select a user to start texting"}{" "}
+              </h1>
+            </div>
+            <div
+              className="w-full h-[80%] bg--300 border-b-[1.5px] overflow-x-hidden overflow-y-auto p-4 flex flex-col gap-2"
+              ref={chatContainerRef}
+            >
+              {loadingMessages && (
+                <div className="text-center text-zinc-400 my-auto">
+                  Loading...
+                </div>
+              )}
+              {messages.length === 0 && (
+                <div className="text-center text-zinc-400 my-auto">
+                  No messages yet.
+                </div>
+              )}
+              {messages.map((msg, idx) => {
+                const fromOwner =
+                  msg.senderId === selectedUser._id ||
+                  msg.sender === selectedUser._id;
+                const fromUser =
+                  msg.senderId === user._id || msg.sender === user._id;
+                return (
+                  <div
+                    key={idx}
+                    className={`flex ${
+                      fromUser ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`chat-icon2 max-w-[70%] px-4 py-2 rounded-lg shadow-sm ${
+                        fromUser
+                          ? "rounded-br-2xl rounded-tr-2xl"
+                          : "rounded-bl-2xl rounded-tl-2xl"
+                      }text-base`}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                );
+              })}
+              {/* <div ref={messagesEndRef} /> */}
+            </div>
+            <form
+              className="w-full h-[10%] bg--400 flex justify-between"
+              onSubmit={handleSendMessage}
+            >
+              <div className="w-[88%] h-full bg--400">
+                <input
+                  type="text"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  className="w-full h-full pl-7 focus:outline-none focus:ring-0"
+                  placeholder="start typing your message here"
+                />
+              </div>
+              {/* <div className="w-[15%] h-full bg--400 border-l-[1.5px] border-gray-600"></div> */}
+              <button type="submit">
+                <i className="ri-send-plane-2-line mx-auto my-auto text-lg chat-icon rounded-full px-2 py-2 mr-3"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Title */}
-      <div className="w-[95%] h-[15vh] bg--400 mx-auto flex flex-col items-center justify-center lg:h-[32vh] lg:mt-[3.3vh] relative">
+      <div
+        className="w-[95%] h-[15vh] bg--400 mx-auto flex flex-col items-center justify-center lg:h-[32vh] lg:mt-[3.3vh] relative"
+        onClick={() => setChatBox(false)}
+      >
         <h1 className="font-[poppins] text-[6vw] lg:text-[6vw] font-black ">
           Affordable books. Zero hassle.
         </h1>
