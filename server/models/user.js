@@ -36,6 +36,10 @@ const userSchema = mongoose.Schema({
     ref: "College",
     required: true,
   },
+  totalRevenue: {
+    type: Number,
+    default: 0,
+  },
 });
 
 export const User = mongoose.model("User", userSchema);

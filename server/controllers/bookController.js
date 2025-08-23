@@ -28,6 +28,9 @@ export const listBook = async (req, res) => {
 
     const savedBook = await newBook.save();
 
+    user.listed_books.push(savedBook._id);
+    await user.save();
+
     res
       .status(200)
       .json({ message: "Book listing successfull", book: savedBook });
@@ -212,6 +215,12 @@ export const verifyPayment = async (req, res) => {
       user.rented_books.push(book._id);
       await user.save();
 
+      const owner = await User.findById(book.owner);
+      if (owner) {
+        owner.totalRevenue = (owner.totalRevenue || 0) + book.price;
+        await owner.save();
+      }
+
       return res
         .status(200)
         .json({ message: "Payment verified successfully", book });
@@ -292,6 +301,7 @@ export const bookReturn = async (req, res) => {
     book.isPGOpen = false;
     book.isRented = false;
     book.tenant = null;
+    book.rentedAt = null;
 
     await book.save();
     res.status(200).json({ message: "Book return successful", book });

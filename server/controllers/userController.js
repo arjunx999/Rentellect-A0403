@@ -4,7 +4,38 @@ import { Message } from "../models/message.js";
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id)
+      .populate("college", "name")
+      .populate({
+        path: "listed_books",
+        select:
+          "_id title rentedAt tenant rental_time price college isRented condition",
+        populate: [
+          {
+            path: "college",
+            select: "name",
+          },
+          {
+            path: "tenant",
+            select: "name _id",
+          },
+        ],
+      })
+      .populate({
+        path: "rented_books",
+        select: "title rentedAt tenant rental_time price college owner",
+        populate: [
+          {
+            path: "owner",
+            select: "name _id",
+          },
+          {
+            path: "college",
+            select: "name",
+          },
+        ],
+      });
+
     res.status(200).json(user);
   } catch (err) {
     res.status(404).json({ message: err.message });
