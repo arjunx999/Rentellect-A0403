@@ -225,7 +225,7 @@ const Admin = () => {
             onClick={() => Navigate(`/home`)}
             className="chat-icon px-2 lg:px-5 py-1 lg:py-2.5 rounded-full text-sm font-semibold font-[poppins] text-gradient"
           >
-            <i className="ri-user-3-line text-xl block lg:hidden"></i>
+            <i className="ri-home-4-line text-xl block lg:hidden"></i>
 
             <span className="hidden lg:inline text-gradient">Home</span>
           </button>
@@ -240,7 +240,7 @@ const Admin = () => {
         </div>
       </div>
 
-      <div className="w-full min-h-[92vh] h-auto flex bg--400 relative">
+      <div className="w-full min-h-[92vh] h-auto flex bg--400 relative justify-center">
         <div className="hidden sm:block w-[21%] h-full bg--300 border--[1.5px] border-gray-800 lg:flex justify-center items-start mt-[2vh] pl-[2vw] flex-col gap-y-[3vh]">
           <div className="w-[100%] h-[36vh] rounded-4xl chat-icon flex flex-col items-center pt-[5vh] gap-y-[0.5vh]">
             <div className="w-[5.5vw] h-[5.5vw] bg-zinc-300 rounded-full mb-1 flex items-center justify-center text-4xl font-[poppins]">
@@ -264,29 +264,29 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="w-[79%] h-auto bg--300 pt-[1vh] pb-[5vh] flex flex-col items-center overflow-y-scroll">
-          <div className="w-[95%] h-[25vh] bg--700 flex items-center justify-center gap-x-[2vw]">
-            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-8 font-[poppins] gap-y-2">
-              <h1 className="text-2xl">Total Books Listed</h1>
-              <h1 className="text-3xl">{user && totalListed}</h1>
+        <div className="w-[100%] lg:w-[79%] h-auto bg--300 pt-[1vh] pb-[5vh] flex flex-col items-center overflow-y-scroll">
+          <div className="w-[95%] h-[18vh] text-center lg:h-[25vh] bg--700 flex items-center justify-center gap-x-[2vw]">
+            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-2 lg:pt-8 font-[poppins] gap-y-2 text-xs">
+              <h1 className="lg:text-2xl">Total Books Listed</h1>
+              <h1 className="lg:text-3xl">{user && totalListed}</h1>
             </div>
-            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-8 font-[poppins] gap-y-2">
-              <h1 className="text-2xl">
-                Active Rentals <span className="text-lg">(given)</span>
+            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-2 lg:pt-8 font-[poppins] gap-y-2 text-xs">
+              <h1 className="lg:text-2xl">
+                Active Rentals <span className="lg:text-lg">(given)</span>
               </h1>
-              <h1 className="text-3xl">
+              <h1 className="lg:text-3xl">
                 <i className="ri-store-3-line mr-2"></i>
                 {user && totalRentedOut}
               </h1>
             </div>
-            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-8 font-[poppins] gap-y-2">
-              <h1 className="text-2xl">Total Revenue</h1>
-              <h1 className="text-3xl">₹{user && totalRevenue}</h1>
+            <div className="w-[31%] h-[92%] chat-icon rounded-4xl bg--700 flex flex-col items-center pt-2 lg:pt-8 font-[poppins] gap-y-2 text-xs">
+              <h1 className="lg:text-2xl">Total Revenue</h1>
+              <h1 className="lg:text-3xl">₹{user && totalRevenue}</h1>
             </div>
           </div>
 
           {chatBox ? (
-            <div className="w-[75%] lg:w-[93%] mt-2 h-[100%] text-xs lg:text-sm lg:h-[70vh] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
+            <div className="w-[90%] lg:w-[93%] mt-2 h-[80vh] text-xs lg:text-sm lg:h-[70vh] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
               <div className="w-full h-[10%] bg--400 border-b-[1.5px] border-gray-600 flex justify-between items-center px-7">
                 <h1 className="capitalize font-[poppins] text-zinc-900 ">
                   {selectedChatUser?.name}{" "}
@@ -352,37 +352,44 @@ const Admin = () => {
             </div>
           ) : (
             <>
-              <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">
+              <div className="w-[95%] min-h-[40vh] lg:min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-3 lg:p-7 font-[poppins] overflow-x-scroll">
+                <h2 className="lg:text-xl font-semibold text-gray-700 lg:mb-2">
                   My Listings:
                 </h2>
-                <table className="w-full text-left">
+                <table className="w-full text-center lg:text-left">
                   <thead>
-                    <tr className="text-gray-600">
-                      <th className="py-2">Name</th>
-                      <th className="py-2">Condition</th>
-                      <th className="py-2">Price</th>
-                      <th className="py-2">Tenant</th>
-                      <th className="py-2">Status</th>
-                      <th className="py-2">Duration</th>
-                      <th className="py-2">Actions</th>
+                    <tr className="text-gray-600 text-xs lg:text-base">
+                      <th className="py-2 px-3 lg:px-0">Name</th>
+                      <th className="py-2 px-3 lg:px-0">Condition</th>
+                      <th className="py-2 px-3 lg:px-0">Price</th>
+                      <th className="py-2 px-3 lg:px-0">Tenant</th>
+                      <th className="py-2 px-3 lg:px-0">Status</th>
+                      <th className="py-2 px-3 lg:px-0">Duration</th>
+                      <th className="py-2 px-3 lg:px-0">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {user &&
                       totalListedBooks.map((book) => (
-                        <tr key={book._id} className="border-t border-gray-300">
-                          <td className="py-2">{book.title}</td>
-                          <td className="py-2">{book.condition}</td>
-                          <td className="py-2">₹{book.price}</td>
-                          <td className="py-2">
+                        <tr
+                          key={book._id}
+                          className="border-t border-gray-300  text-xs lg:text-base"
+                        >
+                          <td className="py-2 px-3 lg:px-0">{book.title}</td>
+                          <td className="py-2 px-3 lg:px-0">
+                            {book.condition}
+                          </td>
+                          <td className="py-2 px-3 lg:px-0">₹{book.price}</td>
+                          <td className="py-2 px-3 lg:px-0">
                             {book.isRented ? book.tenant.name : "Null"}
                           </td>
-                          <td className="py-2">
+                          <td className="py-2 px-3 lg:px-0">
                             {book.isRented ? "Rented" : "Available"}
                           </td>
-                          <td className="py-2">{book.rental_time} Days</td>
-                          <td className="py-2 cursor-pointer text-lg flex gap-3">
+                          <td className="py-2 px-3 lg:px-0">
+                            {book.rental_time} Days
+                          </td>
+                          <td className="py-2 px-3 lg:px-0 cursor-pointer lg:text-lg flex gap-3">
                             {book.isRented && (
                               <div className="relative group inline-block">
                                 <i
@@ -448,29 +455,36 @@ const Admin = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">
+              <div className="w-[95%] min-h-[40vh] lg:min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-3 lg:p-7 font-[poppins] overflow-x-scroll">
+                <h2 className="text-sm lg:text-xl font-semibold text-gray-700 lg:mb-2">
                   My Rentals:
                 </h2>
-                <table className="w-full text-left">
+                <table className="w-full text-center lg:text-left">
                   <thead>
-                    <tr className="text-gray-600">
-                      <th className="py-2">Name</th>
-                      <th className="py-2">Owner</th>
-                      <th className="py-2">Location</th>
-                      <th className="py-2">Rented At</th>
-                      <th className="py-2">Duration</th>
-                      <th className="py-2">Actions</th>
+                    <tr className="text-gray-600 text-xs lg:text-base">
+                      <th className="py-2 px-3 lg:px-0">Name</th>
+                      <th className="py-2 px-3 lg:px-0">Owner</th>
+                      <th className="py-2 px-3 lg:px-0">Location</th>
+                      <th className="py-2 px-3 lg:px-0">Rented At</th>
+                      <th className="py-2 px-3 lg:px-0">Duration</th>
+                      <th className="py-2 px-3 lg:px-0">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {user &&
                       totalRentedBooks.map((book) => (
-                        <tr key={book._id} className="border-t border-gray-300">
-                          <td className="py-2">{book.title}</td>
-                          <td className="py-2">{book.owner.name}</td>
-                          <td className="py-2">{book.college.name}</td>
-                          <td className="py-2">
+                        <tr
+                          key={book._id}
+                          className="border-t border-gray-300 text-xs lg:text-base"
+                        >
+                          <td className="py-2 px-3 lg:px-0">{book.title}</td>
+                          <td className="py-2 px-3 lg:px-0">
+                            {book.owner.name}
+                          </td>
+                          <td className="py-2 px-3 lg:px-0">
+                            {book.college.name}
+                          </td>
+                          <td className="py-2 px-3 lg:px-0">
                             {new Date(book.rentedAt).toLocaleDateString(
                               "en-IN",
                               {
@@ -480,8 +494,10 @@ const Admin = () => {
                               }
                             )}
                           </td>
-                          <td className="py-2">{book.rental_time} Days</td>
-                          <td className="py-2 text-xl cursor-pointer">
+                          <td className="py-2 px-3 lg:px-0">
+                            {book.rental_time} Days
+                          </td>
+                          <td className="py-2 px-3 lg:px-0 text-xl cursor-pointer">
                             <div className="relative group inline-block">
                               <i
                                 onClick={() => {
@@ -539,7 +555,7 @@ const Admin = () => {
       {showReturnModal && (
         <div className="fixed inset-0 bg--500 font-[poppins] backdrop-blur-[5px] flex items-center justify-center z-50">
           <div className="neu-box-l h-[40vh] flex flex-col items-center justify-center rounded-xl p-[5vh] shadow-lg w-[90vw] max-w-md text-center relative">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 mt-5">
+            <h2 className="lg:text-2xl font-bold mb-6 text-gray-800 mt-5">
               What would you like to do with this book?
             </h2>
 
@@ -549,7 +565,7 @@ const Admin = () => {
                   handleBookReturn(selectedBookId);
                   setShowReturnModal(false);
                 }}
-                className="text-gradient px-4 py-2 rounded neu-button-log"
+                className="text-gradient lg:text-base text-xs px-4 py-2 rounded neu-button-log"
               >
                 Relist Book
               </button>
@@ -560,15 +576,17 @@ const Admin = () => {
                 }}
                 className="px-4 py-2 rounded neu-button-log "
               >
-                <h1 className="text-red-700">Delete Book</h1>
+                <h1 className="text-red-700 lg:text-base text-xs">
+                  Delete Book
+                </h1>
               </button>
             </div>
 
             <button
               onClick={() => setShowReturnModal(false)}
-              className="font-black text-2xl cursor-pointer text-gray-600 hover:text-gray-800 absolute top-3 right-3"
+              className="font-black lg:text-2xl cursor-pointer text-gray-600 hover:text-gray-800 absolute top-3 right-3"
             >
-              <i class="ri-close-fill"></i>
+              <i className="ri-close-fill"></i>
             </button>
           </div>
         </div>
