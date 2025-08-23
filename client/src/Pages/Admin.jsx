@@ -2,7 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { useState, useEffect } from "react";
+import { useRef } from "react";
 import axios from "../api/axios";
+import socket from "../socket";
 
 const Admin = () => {
   const Navigate = useNavigate();
@@ -16,6 +18,84 @@ const Admin = () => {
   const [totalRentedOut, setTotalRentedOut] = useState(0);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
+
+  const [chatBox, setChatBox] = useState(false);
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [selectedChatUser, setSelectedChatUser] = useState(null);
+
+  const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.emit("user-connected", user._id);
+    }
+  }, [user, chatBox]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (text.trim().length < 1 || !selectedChatUser) return;
+
+    const newMsg = {
+      receiverId: selectedChatUser._id,
+      content: text,
+      senderId: user._id,
+    };
+
+    socket.emit("send-message", newMsg);
+    setMessages((prev) => [...prev, { ...newMsg, sender: user._id }]);
+    setText("");
+  };
+
+  useEffect(() => {
+    const FetchMessages = async () => {
+      try {
+        if (!selectedChatUser?._id) return;
+        const token = sessionStorage.getItem("token");
+        const res = await axios.get(
+          `/messages/get-messages/${selectedChatUser._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setMessages(res.data);
+      } catch (error) {
+        console.log("error loading messages: ", error);
+      }
+    };
+
+    if (chatBox && selectedChatUser) {
+      FetchMessages();
+    }
+  }, [chatBox, selectedChatUser]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReceiveMessage = (msg) => {
+      if (
+        selectedChatUser &&
+        (msg.sender === selectedChatUser._id ||
+          msg.receiver === selectedChatUser._id)
+      ) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [selectedChatUser, socket]);
 
   const fetchUserDetails = async () => {
     try {
@@ -205,144 +285,228 @@ const Admin = () => {
             </div>
           </div>
 
-          <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              My Listings:
-            </h2>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-gray-600">
-                  <th className="py-2">Name</th>
-                  <th className="py-2">Condition</th>
-                  <th className="py-2">Price</th>
-                  <th className="py-2">Tenant</th>
-                  <th className="py-2">Status</th>
-                  <th className="py-2">Duration</th>
-                  <th className="py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {user &&
-                  totalListedBooks.map((book) => (
-                    <tr key={book._id} className="border-t border-gray-300">
-                      <td className="py-2">{book.title}</td>
-                      <td className="py-2">{book.condition}</td>
-                      <td className="py-2">₹{book.price}</td>
-                      <td className="py-2">
-                        {book.isRented ? book.tenant.name : "Null"}
-                      </td>
-                      <td className="py-2">
-                        {book.isRented ? "Rented" : "Available"}
-                      </td>
-                      <td className="py-2">{book.rental_time} Days</td>
-                      <td className="py-2 cursor-pointer text-lg flex gap-3">
-                        {book.isRented && (
-                          <div className="relative group inline-block">
-                            <i className="ri-chat-1-line text-xl text-gradient"></i>
-                            <div
-                              className="absolute -top-5 left-1/2 -translate-x-1/2 
-                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
-                            opacity-0 group-hover:opacity-100 
-                            transition-opacity duration-300 whitespace-nowrap"
-                            >
-                              Contact Tenant
-                            </div>
-                          </div>
-                        )}
+          {chatBox ? (
+            <div className="w-[75%] lg:w-[93%] mt-2 h-[100%] text-xs lg:text-sm lg:h-[70vh] bg--700 border-gray-600 overflow-hidden border-[1.5px] rounded-4xl font-[poppins] flex flex-col">
+              <div className="w-full h-[10%] bg--400 border-b-[1.5px] border-gray-600 flex justify-between items-center px-7">
+                <h1 className="capitalize font-[poppins] text-zinc-900 ">
+                  {selectedChatUser?.name}{" "}
+                </h1>
+                <i
+                  onClick={() => setChatBox(false)}
+                  className="cursor-pointer ri-close-line text-xl font-bold"
+                ></i>
+              </div>
+              <div
+                className="w-full h-[80%] bg--400 overflow-y-auto p-4 flex flex-col gap-2"
+                ref={chatContainerRef}
+              >
+                {messages.length === 0 && (
+                  <div className="text-center text-zinc-400">
+                    No messages yet.
+                  </div>
+                )}
+                {messages.map((msg, idx) => {
+                  const fromOther =
+                    msg.senderId === selectedChatUser?._id ||
+                    msg.sender === selectedChatUser?._id;
+                  const fromUser =
+                    msg.senderId === user._id || msg.sender === user._id;
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex ${
+                        fromUser ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`chat-icon2 max-w-[70%] px-4 py-2 rounded-lg shadow-sm ${
+                          fromUser
+                            ? "rounded-br-2xl rounded-tr-2xl"
+                            : "rounded-bl-2xl rounded-tl-2xl"
+                        } text-base`}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                        {!book.isRented && (
-                          <div className="relative group inline-block">
-                            <i
-                              onClick={() => {
-                                handleDeleteBook(book._id);
-                              }}
-                              className="ri-delete-bin-5-line text-red-600"
-                            ></i>
-                            <div
-                              className="absolute -top-5 left-1/2 -translate-x-1/2 
-                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
-                            opacity-0 group-hover:opacity-100 
-                            transition-opacity duration-300 whitespace-nowrap"
-                            >
-                              Delete Listing
-                            </div>
-                          </div>
-                        )}
-
-                        {book.isRented && (
-                          <div className="relative group inline-block">
-                            <i
-                              onClick={() => {
-                                setSelectedBookId(book._id);
-                                setShowReturnModal(true);
-                              }}
-                              className="ri-checkbox-circle-line text-xl text-blue-600 cursor-pointer"
-                            />
-
-                            <div
-                              className="absolute -top-5 left-1/2 -translate-x-1/2 
-                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
-                            opacity-0 group-hover:opacity-100 
-                            transition-opacity duration-300 whitespace-nowrap"
-                            >
-                              Complete Return
-                            </div>
-                          </div>
-                        )}
-                      </td>
+              <form
+                className="w-full h-[10%] bg--400 border-t-[1.5px] border-gray-600 flex justify-between"
+                onSubmit={handleSendMessage}
+              >
+                <div className="w-[88%] h-full bg--400">
+                  <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    className="w-full h-full pl-7 focus:outline-none focus:ring-0"
+                    placeholder="start typing your message here"
+                  />
+                </div>
+                <button type="submit">
+                  <i className="ri-send-plane-2-line mx-auto my-auto text-lg chat-icon rounded-full px-2 py-2 mr-3"></i>
+                </button>
+              </form>
+            </div>
+          ) : (
+            <>
+              <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
+                <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                  My Listings:
+                </h2>
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-gray-600">
+                      <th className="py-2">Name</th>
+                      <th className="py-2">Condition</th>
+                      <th className="py-2">Price</th>
+                      <th className="py-2">Tenant</th>
+                      <th className="py-2">Status</th>
+                      <th className="py-2">Duration</th>
+                      <th className="py-2">Actions</th>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              My Rentals:
-            </h2>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-gray-600">
-                  <th className="py-2">Name</th>
-                  <th className="py-2">Owner</th>
-                  <th className="py-2">Location</th>
-                  <th className="py-2">Rented At</th>
-                  <th className="py-2">Duration</th>
-                  <th className="py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {user &&
-                  totalRentedBooks.map((book) => (
-                    <tr key={book._id} className="border-t border-gray-300">
-                      <td className="py-2">{book.title}</td>
-                      <td className="py-2">{book.owner.name}</td>
-                      <td className="py-2">{book.college.name}</td>
-                      <td className="py-2">
-                        {new Date(book.rentedAt).toLocaleDateString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="py-2">{book.rental_time} Days</td>
-                      <td className="py-2 text-xl cursor-pointer">
-                        <div className="relative group inline-block">
-                          <i className="ri-chat-1-line text-xl text-gradient"></i>
-                          <div
-                            className="absolute -top-5 left-1/2 -translate-x-1/2 
+                  </thead>
+                  <tbody>
+                    {user &&
+                      totalListedBooks.map((book) => (
+                        <tr key={book._id} className="border-t border-gray-300">
+                          <td className="py-2">{book.title}</td>
+                          <td className="py-2">{book.condition}</td>
+                          <td className="py-2">₹{book.price}</td>
+                          <td className="py-2">
+                            {book.isRented ? book.tenant.name : "Null"}
+                          </td>
+                          <td className="py-2">
+                            {book.isRented ? "Rented" : "Available"}
+                          </td>
+                          <td className="py-2">{book.rental_time} Days</td>
+                          <td className="py-2 cursor-pointer text-lg flex gap-3">
+                            {book.isRented && (
+                              <div className="relative group inline-block">
+                                <i
+                                  onClick={() => {
+                                    setSelectedChatUser(book.tenant);
+                                    setChatBox(true);
+                                  }}
+                                  className="ri-chat-1-line text-xl text-gradient"
+                                ></i>
+                                <div
+                                  className="absolute -top-5 left-1/2 -translate-x-1/2 
+                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
+                            opacity-0 group-hover:opacity-100 
+                            transition-opacity duration-300 whitespace-nowrap"
+                                >
+                                  Contact Tenant
+                                </div>
+                              </div>
+                            )}
+
+                            {!book.isRented && (
+                              <div className="relative group inline-block">
+                                <i
+                                  onClick={() => {
+                                    handleDeleteBook(book._id);
+                                  }}
+                                  className="ri-delete-bin-5-line text-red-600"
+                                ></i>
+                                <div
+                                  className="absolute -top-5 left-1/2 -translate-x-1/2 
+                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
+                            opacity-0 group-hover:opacity-100 
+                            transition-opacity duration-300 whitespace-nowrap"
+                                >
+                                  Delete Listing
+                                </div>
+                              </div>
+                            )}
+
+                            {book.isRented && (
+                              <div className="relative group inline-block">
+                                <i
+                                  onClick={() => {
+                                    setSelectedBookId(book._id);
+                                    setShowReturnModal(true);
+                                  }}
+                                  className="ri-checkbox-circle-line text-xl text-blue-600 cursor-pointer"
+                                />
+
+                                <div
+                                  className="absolute -top-5 left-1/2 -translate-x-1/2 
+                            bg-gray-900 text-white text-xs px-2 py-1 rounded 
+                            opacity-0 group-hover:opacity-100 
+                            transition-opacity duration-300 whitespace-nowrap"
+                                >
+                                  Complete Return
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="w-[95%] min-h-[35vh] h-auto bg--700 rounded-4xl chat-icon flex flex-col gap-x-[2vw] mt-[2.5vh] p-7 font-[poppins]">
+                <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                  My Rentals:
+                </h2>
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-gray-600">
+                      <th className="py-2">Name</th>
+                      <th className="py-2">Owner</th>
+                      <th className="py-2">Location</th>
+                      <th className="py-2">Rented At</th>
+                      <th className="py-2">Duration</th>
+                      <th className="py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {user &&
+                      totalRentedBooks.map((book) => (
+                        <tr key={book._id} className="border-t border-gray-300">
+                          <td className="py-2">{book.title}</td>
+                          <td className="py-2">{book.owner.name}</td>
+                          <td className="py-2">{book.college.name}</td>
+                          <td className="py-2">
+                            {new Date(book.rentedAt).toLocaleDateString(
+                              "en-IN",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )}
+                          </td>
+                          <td className="py-2">{book.rental_time} Days</td>
+                          <td className="py-2 text-xl cursor-pointer">
+                            <div className="relative group inline-block">
+                              <i
+                                onClick={() => {
+                                  setSelectedChatUser(book.owner);
+                                  setChatBox(true);
+                                }}
+                                className="ri-chat-1-line text-xl text-gradient"
+                              ></i>
+                              <div
+                                className="absolute -top-5 left-1/2 -translate-x-1/2 
                           bg-gray-900 text-white text-xs px-2 py-1 rounded 
                           opacity-0 group-hover:opacity-100 
                           transition-opacity duration-300 whitespace-nowrap"
-                          >
-                            Contact Owner
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+                              >
+                                Contact Owner
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

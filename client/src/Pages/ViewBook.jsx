@@ -119,6 +119,25 @@ const ViewBook = () => {
     }
   }, [chatBox, book?.owner?._id, handleSendMessage]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReceiveMessage = (msg) => {
+      if (
+        book?.owner?._id &&
+        (msg.senderId === book.owner._id || msg.receiverId === book.owner._id)
+      ) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [book?.owner?._id]);
+
   if (!user)
     return (
       <div className="w-[100vw] h-[100vh] bg-[#e0e0e0] text-8xl font-black flex items-center justify-center font-[poppins]">
