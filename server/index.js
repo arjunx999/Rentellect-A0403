@@ -19,7 +19,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://rentellect-a0403.vercel.app"],
     credentials: true,
   },
 });
@@ -29,7 +29,7 @@ connectDB();
 // app.use(cors());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://rentellect-a0403.vercel.app"],
     credentials: true,
   })
 );
