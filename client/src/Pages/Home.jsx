@@ -155,7 +155,15 @@ const Home = () => {
   };
 
   useEffect(() => {
-    socket.on("receive-message", (msg) => {
+    if (user?._id) {
+      socket.emit("user-connected", user._id);
+    }
+  }, [user, chatBox]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReceiveMessage = (msg) => {
       if (
         selectedUser &&
         (msg.senderId === selectedUser._id ||
@@ -163,9 +171,14 @@ const Home = () => {
       ) {
         setMessages((prev) => [...prev, msg]);
       }
-    });
-    return () => socket.off("receive-message");
-  }, [selectedUser]);
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [selectedUser, socket]);
 
   useEffect(() => {
     if (!selectedUser || !token) return;
